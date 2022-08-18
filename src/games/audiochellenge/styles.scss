@@ -6,9 +6,6 @@ html{
 }
 body
 {
-  min-width: 470px;
-  margin:0;
-  padding: 0;
   font-family: Verdana, Geneva, Tahoma, sans-serif;
 }
 .games-wrapper{
@@ -27,6 +24,7 @@ body
     max-width: 650px;
     box-sizing: border-box;
     border-radius: 10px;
+    background-color: #fff;
     color: #363232;
     font-size: 1.2rem;
     box-shadow: 0 1px 2px 0 rgba(0,0,0,.25),0 2px 4px 1px rgba(0,0,0,.2),0 4px 8px 2px rgba(0,0,0,.15),0 8px 16px 4px rgba(0,0,0,.1);
@@ -70,4 +68,7 @@ body
 }
 .button-number:hover{
     background-color: #FAFD05;
+}
+.hidden-style{
+  display: none;
 }
