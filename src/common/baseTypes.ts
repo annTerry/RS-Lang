@@ -16,11 +16,15 @@ type WordSimple = {
 };
 
 type User = {
+  'id'?: string,
   'name': string,
   'email': string,
-  'password': string
+  'password'?: string
 };
 
 type GetWordsFunction = (data:Array<WordSimple>) => void;
+type PostUserFunction = (data:User) => boolean;
 
-export { WordSimple, User, GetWordsFunction };
+export {
+  WordSimple, User, GetWordsFunction, PostUserFunction,
+};
