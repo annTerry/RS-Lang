@@ -1,6 +1,7 @@
 import './style.scss';
-import audiochellenge from './games/audiochellenge/audiochellenge1';
+import Audiochellenge from './games/audiochellenge/audiochellenge';
 
 console.log('Works!');
+
 const audiolink = document.getElementById('audiochellenge-link');
-audiolink?.addEventListener('click', audiochellenge);
+audiolink?.addEventListener('click', () => { const gameAudio = new Audiochellenge(); gameAudio.creat(); });
