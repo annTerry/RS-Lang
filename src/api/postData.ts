@@ -1,5 +1,5 @@
 import { DATABASE_LINK } from '../common/constants';
-import { User, PostUserFunction } from '../common/baseTypes';
+import { TUser, PostUserFunction } from '../common/baseTypes';
 
 export default class PostData {
   options: RequestInit = {
@@ -11,10 +11,10 @@ export default class PostData {
     body: '',
   };
 
-  async postData(dataType:string, userData: User, fn:PostUserFunction) {
+  async postData(dataType:string, userData: TUser, fn:PostUserFunction) {
     this.options.body = JSON.stringify(userData);
     await fetch(`${DATABASE_LINK}/${dataType}`, this.options).then((response) => response.json()).then((data:JSON) => {
-      const returnData: User = JSON.parse(JSON.stringify(data));
+      const returnData: TUser = JSON.parse(JSON.stringify(data));
       fn(returnData);
     }).catch((err) => {
       console.log('Error: ', err);
