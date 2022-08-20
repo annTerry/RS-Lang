@@ -69,6 +69,61 @@ body
 .button-number:hover{
     background-color: #FAFD05;
 }
+.game-body{
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  align-items: center;
+  min-height: 400px;
+}
+.game-lives{
+  display: flex;
+  gap:5px;
+}
+.icon-sound{
+  width: 120px;
+  height: 120px;
+}
+.live-item{
+  background:url('../../assets/svg/live.svg');
+  background-repeat: no-repeat;
+  width: 30px;
+  height: 30px;
+}
+.audio-wrapper{
+  background-image: url('../../assets/svg/sound.svg');
+  background-repeat: no-repeat;
+  width: 120px;
+  height: 120px;
+  cursor: pointer;
+  transition: all 0.5s ease-out;
+}
+.audio-wrapper:hover{
+  transform: scale(1.1);
+}
+.game-answer{
+  font-size: 1.5rem;
+  /* visibility: hidden;*/
+}
+.btn-answer-wrapper{
+  display: flex;
+  gap:15px;
+}
+.btn-answer{
+  cursor: pointer;
+  transition: all 0.5s ease-out;
+  background-color: #fff;
+  border: 1px solid #340002;
+  border-radius:5px ;
+  color: #340002;
+  padding: 5px 10px;
+  transition: all 0.3s ease-out;
+}
+.btn-answer:hover{
+  color: #fff;
+  background-color: #340002;
+}
 .hidden-style{
   display: none;
 }

@@ -1,5 +1,5 @@
 import './style.scss';
-import AudioChallenge from './games/audiochellenge/audiochallenge';
+import AudioChallenge from './games/audiochallenge/audiochallenge';
 import Store from './store/store';
 
 console.log('Works!');
