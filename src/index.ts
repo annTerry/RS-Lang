@@ -1,5 +1,5 @@
 import './style.scss';
-import Audiochellenge from './games/audiochellenge/audiochellenge';
+import AudioChallenge from './games/audiochallenge/audiochallenge';
 import Store from './store/store';
 
 console.log('Works!');
@@ -11,4 +11,4 @@ mainStore.setCurrentPage('AudioChallenge');
 console.log(mainStore.getCurrentPageName());
 
 const audiolink = document.getElementById('audiochellenge-link');
-audiolink?.addEventListener('click', () => { const gameAudio = new Audiochellenge(); gameAudio.creat(); });
+audiolink?.addEventListener('click', () => { const gameAudio = new AudioChallenge(); gameAudio.creat(); });
