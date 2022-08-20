@@ -1,7 +1,7 @@
 import './styles.scss';
 import StartPopUpLoyout from './create-html';
 
-export default class Audiochellenge {
+export default class AudioChallenge {
   creat() {
     const main = <HTMLElement>document.querySelector('main');
     const gameWrapper = '<div class="games-wrapper"></div>';
