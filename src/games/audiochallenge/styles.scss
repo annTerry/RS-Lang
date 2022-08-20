@@ -80,14 +80,14 @@ body
 .game-lives{
   display: flex;
   gap:5px;
+  list-style-type:none;
+  padding: 0;
 }
 .icon-sound{
   width: 120px;
   height: 120px;
 }
 .live-item{
-  background:url('../../assets/svg/live.svg');
-  background-repeat: no-repeat;
   width: 30px;
   height: 30px;
 }

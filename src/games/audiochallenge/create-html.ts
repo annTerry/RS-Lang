@@ -24,23 +24,23 @@ const StartPopUpLoyout = `<div class="games-popup">
 </div>
 </div>`;
 const gameLoyout = `<div class="game-body">
-<div class="game-lives">
-   <div class="live-item">
+<ul class="game-lives">
+   <li class="live-item">
    ${liveSVG}
-   </div>
-   <div class="live-item">
+   </li>
+   <li class="live-item">
    ${liveSVG}
-   </div>
-   <div class="live-item">
+   </li>
+   <li class="live-item">
    ${liveSVG}
-   </div>
-   <div class="live-item">
+   </li>
+   <li class="live-item">
    ${liveSVG}
-   </div>
-   <div class="live-item">
+   </li>
+   <li class="live-item">
    ${liveSVG}
-   </div>
-</div>
+   </li>
+</ul>
 <div class="audio-wrapper" id="play-audio">
 </div>
 <p class="game-answer" id="answer">Правильный ответ</p>
