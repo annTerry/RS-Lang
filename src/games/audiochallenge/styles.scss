@@ -1,0 +1,129 @@
+* {
+    margin: 0;
+}
+html{
+  font-size: 10px;
+}
+body
+{
+  font-family: Verdana, Geneva, Tahoma, sans-serif;
+}
+.games-wrapper{
+    display: flex;
+    align-items: center;
+    height: 100vh;
+}
+.games-popup{
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    margin: 0 auto;
+    padding: 30px;
+    max-width: 650px;
+    box-sizing: border-box;
+    border-radius: 10px;
+    background-color: #fff;
+    color: #363232;
+    font-size: 1.2rem;
+    box-shadow: 0 1px 2px 0 rgba(0,0,0,.25),0 2px 4px 1px rgba(0,0,0,.2),0 4px 8px 2px rgba(0,0,0,.15),0 8px 16px 4px rgba(0,0,0,.1);
+}
+.games-popup__title{
+    font-size: 1.8rem;
+    color:#6E0104;
+}
+.games-popup__text{
+    line-height: 2;
+}
+.games-popup__list{
+    list-style-type:none
+}
+.button-number{
+    cursor: pointer;
+    color: #fff;
+    border:none;
+    border-radius: 10px;
+    height: 35px;
+    width: 35px;
+    transition: all 0.5s ease-out;
+}
+.button-number_level-1{
+    background-color: #FFB8BC;
+}
+.button-number_level-2{
+    background-color: #EE7175;
+}
+.button-number_level-3{
+    background-color: #E63237;
+}
+.button-number_level-4{
+    background-color: #A11919;
+}
+.button-number_level-5{
+    background-color: #6E0104;
+}
+.button-number_level-6{
+    background-color: #340002;
+}
+.button-number:hover{
+    background-color: #FAFD05;
+}
+.game-body{
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  align-items: center;
+  min-height: 400px;
+}
+.game-lives{
+  display: flex;
+  gap:5px;
+  list-style-type:none;
+  padding: 0;
+}
+.icon-sound{
+  width: 120px;
+  height: 120px;
+}
+.live-item{
+  width: 30px;
+  height: 30px;
+}
+.audio-wrapper{
+  background-image: url('../../assets/svg/sound.svg');
+  background-repeat: no-repeat;
+  width: 120px;
+  height: 120px;
+  cursor: pointer;
+  transition: all 0.5s ease-out;
+}
+.audio-wrapper:hover{
+  transform: scale(1.1);
+}
+.game-answer{
+  font-size: 1.5rem;
+  /* visibility: hidden;*/
+}
+.btn-answer-wrapper{
+  display: flex;
+  gap:15px;
+}
+.btn-answer{
+  cursor: pointer;
+  transition: all 0.5s ease-out;
+  background-color: #fff;
+  border: 1px solid #340002;
+  border-radius:5px ;
+  color: #340002;
+  padding: 5px 10px;
+  transition: all 0.3s ease-out;
+}
+.btn-answer:hover{
+  color: #fff;
+  background-color: #340002;
+}
+.hidden-style{
+  display: none;
+}

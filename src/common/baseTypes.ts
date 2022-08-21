@@ -1,4 +1,4 @@
-type WordSimple = {
+type TWordSimple = {
   'id': string,
   'group': number,
   'page': number,
@@ -15,16 +15,49 @@ type WordSimple = {
   'textExampleTranslate': string,
 };
 
-type User = {
+type TUser = {
   'id'?: string,
   'name': string,
   'email': string,
   'password'?: string
 };
 
-type GetWordsFunction = (data:Array<WordSimple>) => void;
-type PostUserFunction = (data:User) => boolean;
+enum PagesCategory {
+  Main = 'Main',
+  Textbook = 'Textbook',
+  WordList = 'WordList',
+  AudioChallenge = 'AudioChallenge',
+  SprintChallenge = 'SprintChallenge',
+  Statistics = 'Statistics',
+}
+
+type TPage = {
+  page:PagesCategory,
+  number?:number
+};
+
+type TWordStat = {
+  'hard'?:boolean,
+  'positive':number,
+  'negative':number,
+};
+
+type TWordObject = {
+  'id': string,
+  'stat': TWordStat,
+};
+
+type TStoreBase = {
+  authorization: boolean,
+  token?: string,
+  currentPage: TPage,
+  words?: TWordObject
+};
+
+type GetWordsFunction = (data:Array<TWordSimple>) => void;
+type PostUserFunction = (data:TUser) => boolean;
 
 export {
-  WordSimple, User, GetWordsFunction, PostUserFunction,
+  TWordSimple, TUser, GetWordsFunction, PostUserFunction,
+  TStoreBase, TPage, PagesCategory, TWordStat, TWordObject,
 };
