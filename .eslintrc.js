@@ -11,11 +11,11 @@ module.exports = {
     'airbnb-typescript/base'
   ],
   parser: '@typescript-eslint/parser',
-  "ignorePatterns": ["**/*.json","dist/**"],
+  ignorePatterns: ['**/*.json', 'dist/**'],
   parserOptions: {
     ecmaVersion: '2021',
     sourceType: 'module',
-    "project": ["./tsconfig.json"] 
+    project: ['./tsconfig.json']
   },
   plugins: [
     'import',
@@ -24,6 +24,7 @@ module.exports = {
   rules: {
     'no-debugger': 'off',
     'no-console': 0,
+    'linebreak-style': 0,
     '@typescript-eslint/no-explicit-any': 'error',
     'class-methods-use-this': 'off'
   }
