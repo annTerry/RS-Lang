@@ -34,6 +34,10 @@ const baseConfig = {
     },
     resolve: {
         extensions: ['.ts', '.js'],
+        alias: {
+          '@assets': path.resolve(__dirname, 'src/assets/'),
+          '@common': path.resolve(__dirname, 'src/common/'),
+        }
     },
     output: {
         filename: 'index.js',
