@@ -1,3 +1,6 @@
 import './style.scss';
+import Header from './components/header/header';
+import Footer from './components/footer/footer';
 
-console.log('Works!');
+(() => new Header())();
+(() => new Footer())();

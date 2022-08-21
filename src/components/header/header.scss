@@ -1,0 +1,33 @@
+.header {
+  position: sticky;
+  left: 0;
+  right: 0;
+  top: 0;
+  padding: 1rem 0;
+  background: aquamarine;
+  color: #6c757d;
+
+  &__in {
+    display: flex;
+    flex-wrap: nowrap;
+    justify-content: space-between;
+    align-items: center;
+  }
+
+  .logo {
+    width: 30%;
+    font-size: 1.5rem;
+    font-weight: bold;
+
+    a {
+      text-decoration: none;
+      color: black;
+    }
+  }
+
+  .auth {
+    width: 30%;
+    text-align: end;
+  }
+
+}
