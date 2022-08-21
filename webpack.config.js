@@ -5,16 +5,16 @@ const { CleanWebpackPlugin } = require('clean-webpack-plugin');
 const CopyWebpackPlugin = require("copy-webpack-plugin");
 
 const baseConfig = {
-    entry: path.resolve(__dirname, './src/index.ts'),
-    mode: 'development',
-    module: {
-        rules: [
-            {
-                test: /.ts?$/,
-                use: 'ts-loader',
-                exclude: /node_modules/,
-            },
-                  // Styles: Inject CSS into the head with source maps
+  entry: path.resolve(__dirname, './src/index.ts'),
+  mode: 'development',
+  module: {
+    rules: [
+      {
+        test: /.ts?$/,
+        use: 'ts-loader',
+        exclude: /node_modules/,
+      },
+      // Styles: Inject CSS into the head with source maps
       {
         test: /\.(scss|css)$/,
         use: [
@@ -24,36 +24,41 @@ const baseConfig = {
           {loader: 'sass-loader', options: {sourceMap: true}},
         ],
       },
-
       // Images: Copy image files to build folder
-      {test: /\.(?:ico|gif|png|jpg|jpeg)$/i, type: 'asset/resource'},
-
+      {
+        test: /\.(?:ico|gif|png|jpg|jpeg)$/i,
+        type: 'asset/resource'
+      },
       // Fonts and SVGs: Inline files
-      {test: /\.(woff(2)?|eot|ttf|otf|svg|)$/, type: 'asset/inline'},
-        ],
-    },
-    resolve: {
-        extensions: ['.ts', '.js'],
-        alias: {
-          '@assets': path.resolve(__dirname, 'src/assets/'),
-          '@common': path.resolve(__dirname, 'src/common/'),
-        }
-    },
-    output: {
-        filename: 'index.js',
-        path: path.resolve(__dirname, './dist'),
-    },
-    plugins: [
-        new HtmlWebpackPlugin({
-            template: path.resolve(__dirname, './src/index.html'),
-            filename: 'index.html',
-        }),
-        new CleanWebpackPlugin(),
+      {
+        test: /\.(woff(2)?|eot|ttf|otf|svg|)$/,
+        type: 'asset/inline'
+      },
     ],
+  },
+  resolve: {
+    extensions: ['.ts', '.js'],
+    alias: {
+      '@assets': path.resolve(__dirname, 'src/assets/'),
+      '@common': path.resolve(__dirname, 'src/common/'),
+    }
+  },
+  output: {
+    filename: 'index.js',
+    path: path.resolve(__dirname, './dist'),
+  },
+  plugins: [
+    new HtmlWebpackPlugin({
+      template: path.resolve(__dirname, './src/index.html'),
+      filename: 'index.html',
+    }),
+    new CleanWebpackPlugin(),
+  ],
 };
- module.exports = ({ mode }) => {
-    const isProductionMode = mode === 'prod';
-    const envConfig = isProductionMode ? require('./webpack.prod.config') : require('./webpack.dev.config');
 
-    return merge(baseConfig, envConfig);
-}; 
+module.exports = ({ mode }) => {
+  const isProductionMode = mode === 'prod';
+  const envConfig = isProductionMode ? require('./webpack.prod.config') : require('./webpack.dev.config');
+
+  return merge(baseConfig, envConfig);
+};
