@@ -3,19 +3,21 @@ import './style.scss';
 import Header from './components/header/header';
 import Footer from './components/footer/footer';
 
-import AudioChallenge from './games/audiochallenge/audiochallenge';
 import Store from './store/store';
+import Router from './api/router';
+import PageManager from './components/pageManager';
 
 console.log('Works!');
 
 const mainStore = new Store();
+const mainRouter = new Router(mainStore);
 
 console.log(mainStore.getCurrentPageName());
-mainStore.setCurrentPage('AudioChallenge');
-console.log(mainStore.getCurrentPageName());
 
-(() => new Header())();
+/* mainStore.setCurrentPage('AudioChallenge');
+console.log(mainStore.getCurrentPageName());
+ */
+
+(() => new Header(mainStore))();
 (() => new Footer())();
-
-const audiolink = document.getElementById('audiochellenge-link');
-audiolink?.addEventListener('click', () => { const gameAudio = new AudioChallenge(); gameAudio.creat(); });
+(() => new PageManager(mainStore, mainRouter))();

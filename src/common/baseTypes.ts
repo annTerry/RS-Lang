@@ -56,8 +56,10 @@ type TStoreBase = {
 
 type GetWordsFunction = (data:Array<TWordSimple>) => void;
 type PostUserFunction = (data:TUser) => boolean;
+type StoreCallbackFunction = ()=>void;
 
 export {
   TWordSimple, TUser, GetWordsFunction, PostUserFunction,
   TStoreBase, TPage, PagesCategory, TWordStat, TWordObject,
+  StoreCallbackFunction,
 };
