@@ -43,7 +43,8 @@ const gameLoyout = `<div class="game-body">
 </ul>
 <div class="audio-wrapper" id="play-audio">
 </div>
-<p class="game-answer" id="answer">Правильный ответ</p>
+<div class="answer-img" id="answer-img"></div>
+<p class="game-answer hidden-style" id="answer">Правильный ответ</p>
 <div class="btn-answer-wrapper">
    <button class="btn-answer" id="answer1">1. ответ</button>
    <button class="btn-answer" id="answer2">2. ответ</button>

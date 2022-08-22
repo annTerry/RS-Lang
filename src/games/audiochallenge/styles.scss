@@ -94,6 +94,7 @@ body
 .audio-wrapper{
   background-image: url('../../assets/svg/sound.svg');
   background-repeat: no-repeat;
+  background-size: cover;
   width: 120px;
   height: 120px;
   cursor: pointer;
@@ -102,9 +103,22 @@ body
 .audio-wrapper:hover{
   transform: scale(1.1);
 }
+.audio-wrapper_hidden{
+display: none;
+}
+.answer-img{
+  display: none;
+  background-repeat: no-repeat;
+  background-size: cover;
+  border-radius: 50%;
+  width: 120px;
+  height: 120px;
+}
+.answer-img_active{
+  display: block;
+}
 .game-answer{
   font-size: 1.5rem;
-  /* visibility: hidden;*/
 }
 .btn-answer-wrapper{
   display: flex;
@@ -124,14 +138,24 @@ body
   color: #fff;
   background-color: #340002;
 }
+.btn-answer_true:hover,
 .btn-answer_true{
   background-color: rgba(87, 153, 21, 0.616);
   color: #fff;
+  border: 0;
+  cursor:default;
 }
+.btn-answer_false:hover,
 .btn-answer_false{
   background-color: #A11919;
   color: #fff;
+  border: 0;
+  cursor:default;
+}
+.btn-skip{
+  width: 90px;
+  height: 30px;
 }
 .hidden-style{
-  display: none;
+  visibility: hidden;
 }

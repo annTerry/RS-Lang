@@ -2,7 +2,6 @@ import './styles.scss';
 import { StartPopUpLoyout, gameLoyout } from './create-html';
 import { DATABASE_LINK } from '../../common/constants';
 import { TWordSimple } from '../../common/baseTypes';
-import getMixArray from './util';
 
 async function getWords(level:number, pageNumber?: number) {
   let wordsArray: Array<TWordSimple>;
@@ -79,17 +78,52 @@ export default class AudioChallenge {
   }
 
   askNewWord(word: TWordSimple, randomAnswers:Array<string>) {
+    // звук
     const playAudioBtn = <HTMLElement>document.getElementById('play-audio');
     playAudioBtn.addEventListener('click', () => { this.play(word.audio); });
+    // правильный ответ
     const answerText = <HTMLElement>document.getElementById('answer');
     answerText.innerText = `${word.word} ${word.transcription}`;
+    // правильный ответ в случайном месте
     const idTrueAnswer = `answer${Math.floor(Math.random() * 5) + 1}`;
     console.log(idTrueAnswer);
     (<HTMLElement>document.getElementById(idTrueAnswer)).innerText = word.wordTranslate;
     const btnAnswersList = document.querySelectorAll('.btn-answer');
     let btnAnswersArray = Array.prototype.slice.call(btnAnswersList);
-
+    // случайные ответы
     btnAnswersArray = btnAnswersArray.filter((btn) => (btn.id !== idTrueAnswer));
     randomAnswers.forEach((value, index) => { btnAnswersArray[index].innerText = value; });
+    // слушаем ответ
+    const btnAnswersContener = <HTMLElement>document.querySelector('.btn-answer-wrapper');
+    btnAnswersContener.addEventListener('click', (e) => { this.handleAnswersBtn(e, idTrueAnswer, word.image); });
+  }
+
+  handleAnswersBtn(e:Event, idTrueAnswer: string, pathImage:string) {
+    const elm = <HTMLElement>e.target;
+    if (elm.id) {
+      const arrayId = ['answer1', 'answer2', 'answer3', 'answer4', 'answer5'];
+      arrayId.forEach((itemId) => {
+        const btnItem = <HTMLInputElement>document.getElementById(itemId);
+        btnItem.disabled = true;
+        if (itemId === idTrueAnswer) {
+          btnItem.classList.add('btn-answer_true');
+        } else {
+          btnItem.classList.add('btn-answer_false');
+        }
+      });
+      // показать ответ
+      const answerText = <HTMLElement>document.getElementById('answer');
+      answerText.classList.remove('hidden-style');
+      //изменить кнопку
+      const skipBtn = <HTMLElement>document.getElementById('skip');
+      skipBtn.innerText = 'Далее';
+      // показать картинку
+      const playAudioBtn = <HTMLElement>document.getElementById('play-audio');
+      playAudioBtn.classList.add('audio-wrapper_hidden');
+      const answerImg = <HTMLElement>document.getElementById('answer-img');
+      console.log(answerImg)
+      answerImg.style.backgroundImage = `url(${DATABASE_LINK}/${pathImage})`;
+      answerImg.classList.add('answer-img_active');
+    }
   }
 }
