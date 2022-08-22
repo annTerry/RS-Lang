@@ -2,6 +2,7 @@ import { TWordSimple } from '../../common/baseTypes';
 import { DATABASE_LINK } from '../../common/constants';
 
 const ANSEWERS_COUNT = 5;
+
 export default class Question {
   isCorrect : boolean;
 
@@ -62,29 +63,44 @@ export default class Question {
     answerImg.classList.add('answer-img_active');
   }
 
+  showAnswers() {
+    const arrayId = ['answer1', 'answer2', 'answer3', 'answer4', 'answer5'];
+    arrayId.forEach((itemId) => {
+      const btnItem = <HTMLInputElement>document.getElementById(itemId);
+      btnItem.disabled = true;
+      if (itemId === this.idTrueAnswer) {
+        btnItem.classList.add('btn-answer_true');
+      } else {
+        btnItem.classList.add('btn-answer_false');
+      }
+    });
+    // показать ответ
+    const answerText = <HTMLElement>document.getElementById('answer');
+    answerText.classList.remove('hidden-style');
+    // изменить кнопку
+    this.changeBtns();
+    // показать картинку
+    this.showPicture();
+  }
+
   handleAnswersBtn(e:Event) {
     const elm = <HTMLElement>e.target;
     if (elm.id) {
-      const arrayId = ['answer1', 'answer2', 'answer3', 'answer4', 'answer5'];
-      arrayId.forEach((itemId) => {
-        const btnItem = <HTMLInputElement>document.getElementById(itemId);
-        btnItem.disabled = true;
-        if (itemId === this.idTrueAnswer) {
-          btnItem.classList.add('btn-answer_true');
-        } else {
-          btnItem.classList.add('btn-answer_false');
-        }
-      });
-      // показать ответ
-      const answerText = <HTMLElement>document.getElementById('answer');
-      answerText.classList.remove('hidden-style');
-      // изменить кнопку
-      const skipBtn = <HTMLElement>document.getElementById('skip');
-      skipBtn.innerText = 'Далее';
-      // показать картинку
-      this.showPicture();
+      this.showAnswers();
       // проверка ответа
+      this.checkAnswer(elm.id);
+      console.log(this.isCorrect);
     }
   }
 
+  checkAnswer(id: string) {
+    if (id === this.idTrueAnswer) this.isCorrect = true;
+  }
+
+  changeBtns() {
+    const skipBtn = <HTMLElement>document.getElementById('skip');
+    skipBtn.classList.add('conceal');
+    const nextBtn = <HTMLElement>document.getElementById('next');
+    nextBtn.classList.remove('conceal');
+  }
 }

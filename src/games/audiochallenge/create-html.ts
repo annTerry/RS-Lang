@@ -52,7 +52,9 @@ const gameLoyout = `<div class="game-body">
    <button class="btn-answer" id="answer4"></button>
    <button class="btn-answer" id="answer5"></button>
 </div>
-<button class="btn-skip" id="skip">Пропустить</button>
+<button class="btn-next" id="skip">Пропустить</button>
+<button class="btn-next conceal" id="next">Далее</button>
 </div>
 </div>`;
+
 export { StartPopUpLoyout, gameLoyout };
