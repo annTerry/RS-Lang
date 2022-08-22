@@ -44,13 +44,13 @@ const gameLoyout = `<div class="game-body">
 <div class="audio-wrapper" id="play-audio">
 </div>
 <div class="answer-img" id="answer-img"></div>
-<p class="game-answer hidden-style" id="answer">Правильный ответ</p>
+<p class="game-answer hidden-style" id="answer"></p>
 <div class="btn-answer-wrapper">
-   <button class="btn-answer" id="answer1">1. ответ</button>
-   <button class="btn-answer" id="answer2">2. ответ</button>
-   <button class="btn-answer" id="answer3">3. ответ</button>
-   <button class="btn-answer" id="answer4">4. ответ</button>
-   <button class="btn-answer" id="answer5">5. ответ</button>
+   <button class="btn-answer" id="answer1"></button>
+   <button class="btn-answer" id="answer2"></button>
+   <button class="btn-answer" id="answer3"></button>
+   <button class="btn-answer" id="answer4"></button>
+   <button class="btn-answer" id="answer5"></button>
 </div>
 <button class="btn-skip" id="skip">Пропустить</button>
 </div>
