@@ -57,7 +57,7 @@ export default class Question {
 
   showPicture() {
     const playAudioBtn = <HTMLElement>document.getElementById('play-audio');
-    playAudioBtn.classList.add('audio-wrapper_hidden');
+    playAudioBtn.classList.add('conceal');
     const answerImg = <HTMLElement>document.getElementById('answer-img');
     answerImg.style.backgroundImage = `url(${DATABASE_LINK}/${this.word.image})`;
     answerImg.classList.add('answer-img_active');
@@ -89,7 +89,6 @@ export default class Question {
       this.showAnswers();
       // проверка ответа
       this.checkAnswer(elm.id);
-      console.log(this.isCorrect);
     }
   }
 

@@ -25,27 +25,19 @@ const StartPopUpLoyout = `<div class="games-popup">
 </div>`;
 const gameLoyout = `<div class="game-body">
 <ul class="game-lives">
-   <li class="live-item">
-   ${liveSVG}
-   </li>
-   <li class="live-item">
-   ${liveSVG}
-   </li>
-   <li class="live-item">
-   ${liveSVG}
-   </li>
-   <li class="live-item">
-   ${liveSVG}
-   </li>
-   <li class="live-item">
-   ${liveSVG}
-   </li>
+   <li class="live-item"></li>
+   <li class="live-item"></li>
+   <li class="live-item"></li>
+   <li class="live-item"></li>
+   <li class="live-item"></li>
 </ul>
-<div class="audio-wrapper" id="play-audio">
+<div class="game-question">
 </div>
-<div class="answer-img" id="answer-img"></div>
-<p class="game-answer hidden-style" id="answer"></p>
-<div class="btn-answer-wrapper">
+</div>`
+const questionLoyout = `<div class="audio-wrapper" id="play-audio"></div>
+  <div class="answer-img" id="answer-img"></div>
+  <p class="game-answer hidden-style" id="answer"></p>
+  <div class="btn-answer-wrapper">
    <button class="btn-answer" id="answer1"></button>
    <button class="btn-answer" id="answer2"></button>
    <button class="btn-answer" id="answer3"></button>
@@ -53,8 +45,6 @@ const gameLoyout = `<div class="game-body">
    <button class="btn-answer" id="answer5"></button>
 </div>
 <button class="btn-next" id="skip">Пропустить</button>
-<button class="btn-next conceal" id="next">Далее</button>
-</div>
-</div>`;
+<button class="btn-next conceal" id="next">Далее</button>`;
 
-export { StartPopUpLoyout, gameLoyout };
+export { StartPopUpLoyout, gameLoyout, questionLoyout };

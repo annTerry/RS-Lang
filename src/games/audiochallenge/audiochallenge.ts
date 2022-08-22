@@ -1,5 +1,5 @@
 import './styles.scss';
-import { StartPopUpLoyout, gameLoyout } from './create-html';
+import { StartPopUpLoyout, gameLoyout, questionLoyout } from './create-html';
 import { DATABASE_LINK } from '../../common/constants';
 import { TWordSimple } from '../../common/baseTypes';
 import Question from './question';
@@ -32,8 +32,6 @@ export default class AudioChallenge {
 
   wrongAnswers: TWordSimple[];
 
-  // word: TWordSimple | undefined;
-
   livesInGame: number;
 
   constructor() {
@@ -43,7 +41,6 @@ export default class AudioChallenge {
     this.wordsArray = [];
     this.correctAnswers = [];
     this.wrongAnswers = [];
-    // this.word = undefined;
     this.livesInGame = LIVES_GAME;
   }
 
@@ -52,14 +49,14 @@ export default class AudioChallenge {
     const gameWrapper = '<div class="games-wrapper"></div>';
     main.innerHTML = gameWrapper;
     // если пришли с главной страницы
-    this.drawGameLayout(StartPopUpLoyout);
+    this.drawLayout(StartPopUpLoyout, '.games-wrapper');
     const btnLevels = <HTMLElement>document.querySelector('.buttons-levels-wrapper');
     btnLevels.addEventListener('click', (e: Event) => { this.handleLevelBtn(e); });
   }
 
-  drawGameLayout(HTMLLayout: string) {
-    const gameWrapper = <HTMLElement>document.querySelector('.games-wrapper');
-    gameWrapper.innerHTML = HTMLLayout;
+  drawLayout(HTMLLayout: string, wrapperClass:string) {
+    const wrapper = <HTMLElement>document.querySelector(wrapperClass);
+    wrapper.innerHTML = HTMLLayout;
   }
 
   async handleLevelBtn(e: Event) {
@@ -67,7 +64,8 @@ export default class AudioChallenge {
     const arrayId = ['level1', 'level2', 'level3', 'level4', 'level5', 'level6'];
     this.group = arrayId.indexOf(elm.id);
     if (this.group !== -1) {
-      this.drawGameLayout(gameLoyout);
+      this.drawLayout(gameLoyout, '.games-wrapper');
+      this.drawLayout(questionLoyout, '.game-question');
       this.wordsArray = await getWords(this.group, this.page);
       this.startGame();
     }
@@ -75,7 +73,6 @@ export default class AudioChallenge {
 
   async startGame() {
     // const wordsArray = await getWords(this.group, this.page);
-    console.log(this.wordsArray);
     const word = this.wordsArray[this.questionNum];
     const randomAnswers = this.getRandomAnswers(this.wordsArray, word.wordTranslate);
     const question = new Question(word, randomAnswers);
@@ -104,15 +101,24 @@ export default class AudioChallenge {
     } else {
       this.wrongAnswers.push(question.word);
       this.livesInGame -= 1;
-      // сердечки
+      this.drawLives();
     }
 
     if (this.livesInGame > 0) {
       this.questionNum += 1;
-      this.drawGameLayout(gameLoyout);
+      this.drawLayout(questionLoyout, '.game-question');
       this.startGame();
     } else {
       console.log('game over');
     }
+  }
+
+  drawLives() {
+    const livesArray = document.querySelectorAll('.live-item');
+    console.log('livesArray', livesArray);
+    console.log('index', LIVES_GAME - this.livesInGame - 1);
+    const liveItem = <HTMLElement>livesArray[LIVES_GAME - this.livesInGame - 1];
+    liveItem.classList.add('live-item_over');
+    console.log(' liveItem', liveItem);
   }
 }
