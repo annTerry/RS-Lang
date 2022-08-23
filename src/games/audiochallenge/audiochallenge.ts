@@ -4,22 +4,25 @@ import { StartPopUpLoyout, gameLoyout } from './create-html';
 export default class AudioChallenge {
   group:number;
 
+  element = document.createElement('section');
+
   constructor() {
     this.group = -1;
   }
 
-  creat() {
-    const main = <HTMLElement>document.querySelector('main');
+  create():HTMLElement {
+    this.element.classList.add('audio-challenge');
     const gameWrapper = '<div class="games-wrapper"></div>';
-    main.innerHTML = gameWrapper;
+    this.element.innerHTML = gameWrapper;
     // если пришли с главной страницы
     this.drawGameLayout(StartPopUpLoyout);
-    const btnLevels = <HTMLElement>document.querySelector('.buttons-levels-wrapper');
+    const btnLevels = <HTMLElement> this.element.getElementsByClassName('buttons-levels-wrapper')[0];
     btnLevels.addEventListener('click', (e: Event) => { this.handleLevelBtn(e); });
+    return this.element;
   }
 
   drawGameLayout(HTMLLayout: string) {
-    const gameWrapper = <HTMLElement>document.querySelector('.games-wrapper');
+    const gameWrapper = <HTMLElement> this.element.getElementsByClassName('games-wrapper')[0];
     gameWrapper.innerHTML = HTMLLayout;
   }
 

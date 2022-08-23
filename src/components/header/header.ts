@@ -1,13 +1,14 @@
 import './header.scss';
 import { TITLE } from '@common/constants';
+import Store from '../../store/store';
 import Menu from '../menu/menu';
 
 export default class Header {
   menu: Menu;
 
-  constructor() {
+  constructor(store: Store) {
     this.create();
-    this.menu = new Menu();
+    this.menu = new Menu(store);
   }
 
   /**
