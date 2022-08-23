@@ -1,11 +1,8 @@
 import './styles.scss';
-import { StartPopUpLoyout, gameLoyout, questionLoyout } from './create-html';
-import { DATABASE_LINK } from '../../common/constants';
+import { StartPopUpLayout, gameLayout, questionLayout } from './create-html';
+import { DATABASE_LINK, ALL_PAGES, LIVES_GAME } from '../../common/constants';
 import { TWordSimple } from '../../common/baseTypes';
 import Question from './question';
-
-const LIVES_GAME = 5;
-const ALL_PAGES = 30;
 
 async function getWords(level:number, pageNumber?: number) {
   let page:number;
@@ -21,6 +18,8 @@ async function getWords(level:number, pageNumber?: number) {
 
 export default class AudioChallenge {
   group:number;
+
+  element = document.createElement('section');
 
   page: number | undefined;
 
@@ -50,18 +49,19 @@ export default class AudioChallenge {
     this.seriesResult = 0;
   }
 
-  creat() {
-    const main = <HTMLElement>document.querySelector('main');
+  create():HTMLElement {
+    this.element.classList.add('audio-challenge');
     const gameWrapper = '<div class="games-wrapper"></div>';
-    main.innerHTML = gameWrapper;
+    this.element.innerHTML = gameWrapper;
     // если пришли с главной страницы
-    this.drawLayout(StartPopUpLoyout, '.games-wrapper');
-    const btnLevels = <HTMLElement>document.querySelector('.buttons-levels-wrapper');
+    this.drawLayout(StartPopUpLayout, '.games-wrapper');
+    const btnLevels = <HTMLElement> this.element.getElementsByClassName('.buttons-levels-wrapper')[0];
     btnLevels.addEventListener('click', (e: Event) => { this.handleLevelBtn(e); });
+    return this.element;
   }
 
   drawLayout(HTMLLayout: string, wrapperClass:string) {
-    const wrapper = <HTMLElement>document.querySelector(wrapperClass);
+    const wrapper = <HTMLElement> this.element.getElementsByClassName(wrapperClass)[0];
     wrapper.innerHTML = HTMLLayout;
   }
 
@@ -70,8 +70,8 @@ export default class AudioChallenge {
     const arrayId = ['level1', 'level2', 'level3', 'level4', 'level5', 'level6'];
     this.group = arrayId.indexOf(elm.id);
     if (this.group !== -1) {
-      this.drawLayout(gameLoyout, '.games-wrapper');
-      this.drawLayout(questionLoyout, '.game-question');
+      this.drawLayout(gameLayout, '.games-wrapper');
+      this.drawLayout(questionLayout, '.game-question');
       this.wordsArray = await getWords(this.group, this.page);
       this.startGame();
     }
@@ -84,10 +84,10 @@ export default class AudioChallenge {
     const question = new Question(word, randomAnswers);
     question.render();
     // кнопка пропустить
-    const skipBtn = <HTMLElement>document.getElementById('skip');
+    const skipBtn = <HTMLElement> document.getElementById('skip');
     skipBtn.addEventListener('click', () => { question.showAnswers(); });
     // кнопка далее
-    const nextBtn = <HTMLElement>document.getElementById('next');
+    const nextBtn = <HTMLElement> document.getElementById('next');
     nextBtn.addEventListener('click', () => { this.handleNextBtn(question); });
   }
 
@@ -114,7 +114,7 @@ export default class AudioChallenge {
 
     if ((this.livesInGame > 0) && (this.questionNum < this.wordsArray.length - 1)) {
       this.questionNum += 1;
-      this.drawLayout(questionLoyout, '.game-question');
+      this.drawLayout(questionLayout, '.game-question');
       this.startGame();
     } else {
       console.log('game over');
@@ -127,7 +127,7 @@ export default class AudioChallenge {
   }
 
   drawLives() {
-    const livesArray = document.querySelectorAll('.live-item');
+    const livesArray = this.element.getElementsByClassName('.live-item');
     const liveItem = <HTMLElement>livesArray[LIVES_GAME - this.livesInGame - 1];
     liveItem.classList.add('live-item_over');
   }

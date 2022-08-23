@@ -1,4 +1,4 @@
-const StartPopUpLoyout = `<div class="games-popup">
+const StartPopUpLayout = `<div class="games-popup">
 <h3  class="games-popup__title">Аудиовызов</h3>
 <div class="games-popup__text">
     <p> Вы должны выбрать перевод услышанного слова.</p>
@@ -20,7 +20,7 @@ const StartPopUpLoyout = `<div class="games-popup">
    <button class="button-number  button-number_level-6" id="level6">6</button>
 </div>
 </div>`;
-const gameLoyout = `<div class="game-body">
+const gameLayout = `<div class="game-body">
 <ul class="game-lives">
    <li class="live-item"></li>
    <li class="live-item"></li>
@@ -31,7 +31,7 @@ const gameLoyout = `<div class="game-body">
 <div class="game-question">
 </div>
 </div>`;
-const questionLoyout = `<div class="audio-wrapper" id="play-audio"></div>
+const questionLayout = `<div class="audio-wrapper" id="play-audio"></div>
   <div class="answer-img" id="answer-img"></div>
   <p class="game-answer hidden-style" id="answer"></p>
   <div class="btn-answer-wrapper">
@@ -44,4 +44,4 @@ const questionLoyout = `<div class="audio-wrapper" id="play-audio"></div>
 <button class="btn-next" id="skip">Пропустить</button>
 <button class="btn-next conceal" id="next">Далее</button>`;
 
-export { StartPopUpLoyout, gameLoyout, questionLoyout };
+export { StartPopUpLayout, gameLayout, questionLayout };

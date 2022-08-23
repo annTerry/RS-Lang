@@ -11,4 +11,4 @@ mainStore.setCurrentPage('AudioChallenge');
 console.log(mainStore.getCurrentPageName());
 
 const audiolink = document.getElementById('audiochellenge-link');
-audiolink?.addEventListener('click', () => { const gameAudio = new AudioChallenge(); gameAudio.creat(); });
+audiolink?.addEventListener('click', () => { const gameAudio = new AudioChallenge(); gameAudio.create(); });
