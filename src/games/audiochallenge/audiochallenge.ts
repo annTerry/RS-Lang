@@ -34,6 +34,10 @@ export default class AudioChallenge {
 
   livesInGame: number;
 
+  seriesNow: number;
+
+  seriesResult: number;
+
   constructor() {
     this.group = -1;
     this.page = undefined;
@@ -42,6 +46,8 @@ export default class AudioChallenge {
     this.correctAnswers = [];
     this.wrongAnswers = [];
     this.livesInGame = LIVES_GAME;
+    this.seriesNow = 0;
+    this.seriesResult = 0;
   }
 
   creat() {
@@ -98,13 +104,15 @@ export default class AudioChallenge {
   handleNextBtn(question: Question) {
     if (question.isCorrect) {
       this.correctAnswers.push(question.word);
+      this.seriesNow += 1;
     } else {
       this.wrongAnswers.push(question.word);
       this.livesInGame -= 1;
+      this.getSeriesResult();
       this.drawLives();
     }
 
-    if (this.livesInGame > 0) {
+    if ((this.livesInGame > 0) && (this.questionNum < this.wordsArray.length - 1)) {
       this.questionNum += 1;
       this.drawLayout(questionLoyout, '.game-question');
       this.startGame();
@@ -113,12 +121,14 @@ export default class AudioChallenge {
     }
   }
 
+  getSeriesResult() {
+    if (this.seriesNow > this.seriesResult) this.seriesResult = this.seriesNow;
+    this.seriesNow = 0;
+  }
+
   drawLives() {
     const livesArray = document.querySelectorAll('.live-item');
-    console.log('livesArray', livesArray);
-    console.log('index', LIVES_GAME - this.livesInGame - 1);
     const liveItem = <HTMLElement>livesArray[LIVES_GAME - this.livesInGame - 1];
     liveItem.classList.add('live-item_over');
-    console.log(' liveItem', liveItem);
   }
 }
