@@ -1,0 +1,23 @@
+:root {
+  --delay: 200ms;
+  --color-text: black;
+  --color-bg: white;
+}
+
+body {
+  display: flex;
+  flex-direction: column;
+  max-width: 100vw;
+  min-height: 100vh;
+  font: 1rem/1.2 Tahoma, Arial, sans-serif;
+  font-weight: 400;
+  color: var(--color-text);
+  background: var(--color-bg);
+}
+
+.container {
+  width: 60rem;
+  max-width: 100%;
+  margin: auto;
+  padding: 0 1rem;
+}
