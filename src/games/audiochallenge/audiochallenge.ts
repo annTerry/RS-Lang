@@ -3,6 +3,7 @@ import { StartPopUpLayout, gameLayout, questionLayout } from './create-html';
 import { DATABASE_LINK, ALL_PAGES, LIVES_GAME } from '../../common/constants';
 import { TWordSimple } from '../../common/baseTypes';
 import Question from './question';
+import AudioChallengeResults from './results';
 
 async function getWords(level:number, pageNumber?: number) {
   let page:number;
@@ -102,6 +103,7 @@ export default class AudioChallenge {
   }
 
   handleNextBtn(question: Question) {
+    console.log('next0');
     if (question.isCorrect) {
       this.correctAnswers.push(question.word);
       this.seriesNow += 1;
@@ -113,11 +115,18 @@ export default class AudioChallenge {
     }
 
     if ((this.livesInGame > 0) && (this.questionNum < this.wordsArray.length - 1)) {
+      console.log('next1');
       this.questionNum += 1;
       this.drawLayout(questionLayout, 'game-question');
       this.startGame();
     } else {
       console.log('game over');
+      const result = new AudioChallengeResults(
+        this.correctAnswers,
+        this.wrongAnswers,
+        this.seriesResult,
+      );
+      result.render();
     }
   }
 
@@ -127,7 +136,8 @@ export default class AudioChallenge {
   }
 
   drawLives() {
-    const livesArray = this.element.getElementsByClassName('.live-item');
+    const livesArray = this.element.querySelectorAll('.live-item');
+    console.log('livesArray', livesArray);
     const liveItem = <HTMLElement>livesArray[LIVES_GAME - this.livesInGame - 1];
     liveItem.classList.add('live-item_over');
   }
