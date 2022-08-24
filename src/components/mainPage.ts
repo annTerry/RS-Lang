@@ -1,9 +1,9 @@
 export default class MainPage {
   element: HTMLElement;
 
-  constructor() {
+  constructor(styleClass = 'main') {
     this.element = document.createElement('section');
-    this.element.classList.add('main');
+    this.element.classList.add(styleClass);
   }
 
   create():HTMLElement {

@@ -16,7 +16,7 @@ export default class Menu {
 
   // Список пунктов меню
   items: Array<MenuItem> = [
-    { name: 'Учебник', link: '' },
+    { name: 'Учебник', link: '#TextBook' },
     { name: 'Аудиочелендж', link: '#AudioChallenge' },
     { name: 'Спринт', link: '' },
     { name: 'Статистика', link: '' },
