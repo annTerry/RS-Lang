@@ -1,4 +1,5 @@
 import { TWordSimple } from '../../common/baseTypes';
+import { DATABASE_LINK } from '../../common/constants';
 
 export default class AudioChallengeResults {
   correct: TWordSimple[];
@@ -37,18 +38,33 @@ export default class AudioChallengeResults {
     `;
   }
 
+  start() {
+    this.render();
+    const correctContener = <HTMLElement>document.querySelector('.results-correct');
+    correctContener.addEventListener('click', (e) => { this.handleResults(e, this.correct); });
+    const wrongContener = <HTMLElement>document.querySelector('.results-wrong');
+    wrongContener.addEventListener('click', (e) => { this.handleResults(e, this.wrong); });
+  }
+
   generateWordsList(words: TWordSimple[]):string {
     let wordList = '';
-    console.log(words);
-    words.forEach((word) => {
-      console.log('word', word);
+    words.forEach((word, index) => {
       wordList += `<li class="results-item">
-      <div class="sound-icon"></div>
+      <div class="sound-icon" data-id="${index}"></div>
       <span class ="results-item__text">${word.word}</span>
       <span> — ${word.wordTranslate}</span>
       </li>`;
-      console.log('wordList', wordList);
     });
     return wordList;
+  }
+
+  handleResults(e:Event, words: TWordSimple[]) {
+    const elm = <HTMLElement>e.target;
+    if (elm.dataset.id) {
+      const word = words[Number(elm.dataset.id)];
+      const audio = new Audio();
+      audio.src = `${DATABASE_LINK}/${word.audio}`;
+      audio.play();
+    }
   }
 }
