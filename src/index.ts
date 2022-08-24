@@ -17,7 +17,8 @@ console.log(mainStore.getCurrentPageName());
 /* mainStore.setCurrentPage('AudioChallenge');
 console.log(mainStore.getCurrentPageName());
  */
-
+ 
 (() => new Header(mainStore))();
 (() => new Footer())();
 (() => new PageManager(mainStore, mainRouter))();
+
