@@ -10,24 +10,27 @@
     justify-content: center;
     gap: 10px;
     margin: 0 auto;
-    padding: 30px;
-    max-width: 650px;
+    padding: 15px;
+    max-width: 560px;
     box-sizing: border-box;
     border-radius: 10px;
     background-color: #fff;
     color: #363232;
-    font-size: 1.2rem;
+    font-size: 1rem;
     box-shadow: 0 1px 2px 0 rgba(0,0,0,.25),0 2px 4px 1px rgba(0,0,0,.2),0 4px 8px 2px rgba(0,0,0,.15),0 8px 16px 4px rgba(0,0,0,.1);
 }
 .games-popup__title{
-    font-size: 1.8rem;
+    font-size: 1.5rem;
     color:#6E0104;
+    margin: 0;
 }
 .games-popup__text{
-    line-height: 2;
+    line-height: 1.5;
+    margin: 0;
 }
 .games-popup__list{
-    list-style-type:none
+    list-style-type:none;
+    margin: 0;
 }
 .button-number{
     cursor: pointer;

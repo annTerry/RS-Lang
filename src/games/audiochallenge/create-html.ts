@@ -1,7 +1,7 @@
 const StartPopUpLayout = `<div class="games-popup">
 <h3  class="games-popup__title">Аудиовызов</h3>
 <div class="games-popup__text">
-    <p> Вы должны выбрать перевод услышанного слова.</p>
+    <p class="games-popup__text">Вы должны выбрать перевод услышанного слова.</p>
     Чтобы играть с помощью клавиатуры, используй клавиши:
     <ul class="games-popup__list">
         <li>1, 2, 3, 4, 5 - чтобы дать ответ,</li>
