@@ -90,6 +90,8 @@ export default class AudioChallenge {
     // кнопка далее
     const nextBtn = <HTMLElement> document.getElementById('next');
     nextBtn.addEventListener('click', () => { this.handleNextBtn(question); });
+    // клавиатура
+    // document.addEventListener('keydown', (e) => { this.handleKeyboard(e, question); });
   }
 
   getRandomAnswers(wordsArray:Array<TWordSimple>, word:string):Array<string> {
@@ -138,4 +140,19 @@ export default class AudioChallenge {
     const liveItem = <HTMLElement>livesArray[LIVES_GAME - this.livesInGame - 1];
     liveItem.classList.add('live-item_over');
   }
+
+  /* handleKeyboard(e:KeyboardEvent, question: Question) {
+    const nextBtns = <HTMLElement> document.querySelector('#next');
+    if (nextBtns.classList.contains('conceal')) {
+      if (e.key === ' ') {
+        e.preventDefault();
+        (function () {
+          question.showAnswers();
+        }());
+      }
+    } else if (e.key === 'ArrowRight') {
+      e.preventDefault();
+      this.handleNextBtn(question);
+    }
+  } */
 }

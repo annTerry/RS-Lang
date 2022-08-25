@@ -34,6 +34,7 @@ export default class Question {
     // слушаем ответ
     const btnAnswersContener = <HTMLElement>document.querySelector('.btn-answer-wrapper');
     btnAnswersContener.addEventListener('click', (e) => { this.handleAnswersBtn(e); });
+    document.addEventListener('keydown', (e) => { this.handleAnswerKeyboard(e); });
   }
 
   play() {
@@ -89,6 +90,15 @@ export default class Question {
       this.showAnswers();
       // проверка ответа
       this.checkAnswer(elm.id);
+    }
+  }
+
+  handleAnswerKeyboard(e:KeyboardEvent) {
+    if ((e.key === '1') || (e.key === '2') || (e.key === '3') || (e.key === '4') || (e.key === '5')) {
+      e.preventDefault();
+      this.showAnswers();
+      console.log(`answer${e.key}`);
+      this.checkAnswer(`answer${e.key}`);
     }
   }
 
