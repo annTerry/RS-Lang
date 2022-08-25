@@ -25,9 +25,7 @@ export default class Header {
 
           <nav class="menu js-menu"></nav>
 
-          <div class="auth">
-            <button type="button" class="btn btn-outline-primary">Войти</button>
-          </div>
+          <div class="auth js-auth-link"></div>
 
         </div>
       </header>`);
