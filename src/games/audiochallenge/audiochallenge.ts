@@ -92,6 +92,7 @@ export default class AudioChallenge {
     nextBtn.addEventListener('click', () => { this.handleNextBtn(question); });
     // клавиатура
     // document.addEventListener('keydown', (e) => { this.handleKeyboard(e, question); });
+    document.onkeydown = (e) => { this.handleKeyboard(e, question); };
   }
 
   getRandomAnswers(wordsArray:Array<TWordSimple>, word:string):Array<string> {
@@ -105,6 +106,7 @@ export default class AudioChallenge {
   }
 
   handleNextBtn(question: Question) {
+    // document.removeEventListener('keydown', (e) => { this.handleKeyboard(e, question); });
     if (question.isCorrect) {
       this.correctAnswers.push(question.word);
       this.seriesNow += 1;
@@ -141,18 +143,25 @@ export default class AudioChallenge {
     liveItem.classList.add('live-item_over');
   }
 
-  /* handleKeyboard(e:KeyboardEvent, question: Question) {
+  handleKeyboard(e:KeyboardEvent, question: Question) {
+    if (e.key === ' ') {
+      e.preventDefault();
+      question.play();
+    }
+    if ((e.key === '1') || (e.key === '2') || (e.key === '3') || (e.key === '4') || (e.key === '5')) {
+      e.preventDefault();
+      question.showAnswers();
+      question.checkAnswer(`answer${e.key}`);
+    }
     const nextBtns = <HTMLElement> document.querySelector('#next');
     if (nextBtns.classList.contains('conceal')) {
-      if (e.key === ' ') {
+      if (e.key === 'Enter') {
         e.preventDefault();
-        (function () {
-          question.showAnswers();
-        }());
+        question.showAnswers();
       }
     } else if (e.key === 'ArrowRight') {
       e.preventDefault();
       this.handleNextBtn(question);
     }
-  } */
+  }
 }

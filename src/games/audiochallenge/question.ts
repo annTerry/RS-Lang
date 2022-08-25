@@ -34,7 +34,6 @@ export default class Question {
     // слушаем ответ
     const btnAnswersContener = <HTMLElement>document.querySelector('.btn-answer-wrapper');
     btnAnswersContener.addEventListener('click', (e) => { this.handleAnswersBtn(e); });
-    document.addEventListener('keydown', (e) => { this.handleAnswerKeyboard(e); });
   }
 
   play() {
@@ -66,6 +65,7 @@ export default class Question {
 
   showAnswers() {
     const arrayId = ['answer1', 'answer2', 'answer3', 'answer4', 'answer5'];
+    console.log('this.idTrueAnswer 0', this.idTrueAnswer);
     arrayId.forEach((itemId) => {
       const btnItem = <HTMLInputElement>document.getElementById(itemId);
       btnItem.disabled = true;
@@ -93,16 +93,10 @@ export default class Question {
     }
   }
 
-  handleAnswerKeyboard(e:KeyboardEvent) {
-    if ((e.key === '1') || (e.key === '2') || (e.key === '3') || (e.key === '4') || (e.key === '5')) {
-      e.preventDefault();
-      this.showAnswers();
-      console.log(`answer${e.key}`);
-      this.checkAnswer(`answer${e.key}`);
-    }
-  }
-
   checkAnswer(id: string) {
+    console.log('id', id);
+    console.log('this.idTrueAnswer', this.idTrueAnswer);
+    console.log('id === this.idTrueAnswer', id === this.idTrueAnswer);
     if (id === this.idTrueAnswer) this.isCorrect = true;
   }
 
