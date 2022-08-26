@@ -58,6 +58,8 @@ export default class AudioChallenge {
     this.drawLayout(StartPopUpLayout, 'games-wrapper');
     const btnLevels = <HTMLElement> this.element.getElementsByClassName('buttons-levels-wrapper')[0];
     btnLevels.addEventListener('click', (e: Event) => { this.handleLevelBtn(e); });
+    // выбор уровня с клавиатуры
+    document.onkeydown = (e) => { this.handleLevelKeyboard(e); };
     return this.element;
   }
 
@@ -91,7 +93,6 @@ export default class AudioChallenge {
     const nextBtn = <HTMLElement> document.getElementById('next');
     nextBtn.addEventListener('click', () => { this.handleNextBtn(question); });
     // клавиатура
-    // document.addEventListener('keydown', (e) => { this.handleKeyboard(e, question); });
     document.onkeydown = (e) => { this.handleKeyboard(e, question); };
   }
 
@@ -106,7 +107,6 @@ export default class AudioChallenge {
   }
 
   handleNextBtn(question: Question) {
-    // document.removeEventListener('keydown', (e) => { this.handleKeyboard(e, question); });
     if (question.isCorrect) {
       this.correctAnswers.push(question.word);
       this.seriesNow += 1;
@@ -148,7 +148,9 @@ export default class AudioChallenge {
       e.preventDefault();
       question.play();
     }
-    if ((e.key === '1') || (e.key === '2') || (e.key === '3') || (e.key === '4') || (e.key === '5')) {
+    const answerNumber = Number(e.key);
+    // if ((e.key === '1') || (e.key === '2') || (e.key === '3') || (e.key === '4') || (e.key === '5')) {
+    if (answerNumber > 0 && answerNumber < 6) {
       e.preventDefault();
       question.showAnswers();
       question.checkAnswer(`answer${e.key}`);
@@ -162,6 +164,16 @@ export default class AudioChallenge {
     } else if (e.key === 'ArrowRight') {
       e.preventDefault();
       this.handleNextBtn(question);
+    }
+  }
+
+  async handleLevelKeyboard(e: KeyboardEvent) {
+    const group = Number(e.key) - 1;
+    if (group >= 0 && group < 6) {
+      this.drawLayout(gameLayout, 'games-wrapper');
+      this.drawLayout(questionLayout, 'game-question');
+      this.wordsArray = await getWords(group, this.page);
+      this.startGame();
     }
   }
 }
