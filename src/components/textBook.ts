@@ -1,8 +1,8 @@
 import MainPage from './mainPage';
 
-export default class TextBook extends MainPage {
+export default class Textbook extends MainPage {
   constructor() {
-    super('textbook');
-    this.element.textContent = 'textBook';
+    super('Textbook');
+    this.element.textContent = 'Textbook';
   }
 }

@@ -2,15 +2,15 @@ import Router from '../api/router';
 import AudioChallenge from '../games/audiochallenge/audiochallenge';
 import Store from '../store/store';
 import MainPage from './mainPage';
-import TextBook from './textBook';
+import Textbook from './textBook';
 
 const PAGES_TYPES = {
   Main: MainPage,
   AudioChallenge,
-  TextBook,
+  Textbook,
 };
 
-type TPageClass = { [key:string]: AudioChallenge | MainPage | TextBook } | undefined;
+type TPageClass = { [key:string]: AudioChallenge | MainPage | Textbook } | undefined;
 
 export default class PageManager {
   store:Store;
@@ -34,6 +34,7 @@ export default class PageManager {
   resetPage() {
     const currentPage = this.store.getCurrentPageName();
     const currentClass = this.pageClass && this.pageClass[currentPage];
+    this.mainElement.innerHTML = '';
     if (currentClass) {
       this.mainElement.append(currentClass.create());
     } else {
