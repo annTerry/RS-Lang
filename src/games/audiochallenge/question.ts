@@ -65,6 +65,7 @@ export default class Question {
 
   showAnswers() {
     const arrayId = ['answer1', 'answer2', 'answer3', 'answer4', 'answer5'];
+    console.log('this.idTrueAnswer 0', this.idTrueAnswer);
     arrayId.forEach((itemId) => {
       const btnItem = <HTMLInputElement>document.getElementById(itemId);
       btnItem.disabled = true;
@@ -93,6 +94,9 @@ export default class Question {
   }
 
   checkAnswer(id: string) {
+    console.log('id', id);
+    console.log('this.idTrueAnswer', this.idTrueAnswer);
+    console.log('id === this.idTrueAnswer', id === this.idTrueAnswer);
     if (id === this.idTrueAnswer) this.isCorrect = true;
   }
 
