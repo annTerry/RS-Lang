@@ -1,6 +1,6 @@
 import {
   PagesCategory, TStoreBase, TPage, StoreCallbackFunction,
-} from '../common/baseTypes';
+} from '@common/baseTypes';
 
 export default class Store {
   private store:TStoreBase;
@@ -9,10 +9,25 @@ export default class Store {
 
   constructor() {
     this.store = {
-      authorization: false,
+      uid: this.getItem('uid', ''),
+      username: this.getItem('username', ''),
+      token: this.getItem('token', ''),
       currentPage: { page: PagesCategory.Main },
     };
     this.watchers = {};
+  }
+
+  getItem(key: string, defaultValue: string): string {
+    const value = localStorage.getItem(key);
+    return value !== null ? value : defaultValue;
+  }
+
+  setItem(key: string, value: string): void {
+    localStorage.setItem(key, value);
+  }
+
+  removeItem(key: string): void {
+    localStorage.removeItem(key);
   }
 
   addWatcher(action:string, fn: StoreCallbackFunction):void {
@@ -37,24 +52,37 @@ export default class Store {
     return this.store.currentPage.number || 0;
   }
 
-  getAuthorized():boolean {
-    return this.store.authorization;
+  getUser() {
+    return {
+      id: this.store.uid,
+      name: this.store.username,
+      token: this.store.token || '',
+    };
   }
 
-  setAuthorized(authorization:boolean, token?:string) {
+  getAuthorized():boolean {
+    return !!this.store.uid;
+  }
+
+  setAuthorized(uid: string, username: string, token?: string) {
     try {
-      if (token === 'undefined') {
-        if (authorization) throw new Error();
-        else {
-          this.store.authorization = false;
-          this.store.token = undefined;
-        }
+      if (typeof token !== 'string' || !token || !uid) {
+        this.store.uid = '';
+        delete this.store.username;
+        delete this.store.token;
+        this.setItem('uid', '')
+        this.removeItem('username');
+        this.removeItem('token');
       } else {
-        this.store.authorization = authorization;
+        this.store.uid = uid;
+        this.store.username = username;
         this.store.token = token;
+        this.setItem('uid', uid)
+        this.setItem('username', username);
+        this.setItem('token', token);
       }
     } catch (e) {
-      console.log('Wrong Authorization params');
+      console.error('Wrong Authorization params');
     }
   }
 
