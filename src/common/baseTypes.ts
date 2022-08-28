@@ -48,7 +48,8 @@ type TWordObject = {
 };
 
 type TStoreBase = {
-  authorization: boolean,
+  uid: string,
+  username?: string,
   token?: string,
   currentPage: TPage,
   words?: TWordObject
@@ -58,8 +59,16 @@ type GetWordsFunction = (data:Array<TWordSimple>) => void;
 type PostUserFunction = (data:TUser) => boolean;
 type StoreCallbackFunction = ()=>void;
 
+type TErrorMessage = {
+  path?: string,
+  message?: string,
+}
+
+type TAlertType = 'success' | 'warning' | 'danger';
+
 export {
   TWordSimple, TUser, GetWordsFunction, PostUserFunction,
   TStoreBase, TPage, PagesCategory, TWordStat, TWordObject,
+  TAlertType, TErrorMessage,
   StoreCallbackFunction,
 };

@@ -22,5 +22,5 @@ console.log(mainStore.getCurrentPageName());
 (() => new Header(mainStore))();
 (() => new Footer())();
 (() => new PageManager(mainStore, mainRouter))();
-(() => new Auth())();
+(() => new Auth(mainStore))();
 
