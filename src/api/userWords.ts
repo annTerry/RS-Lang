@@ -34,4 +34,22 @@ async function getUserWord(userId: string, userToken: string, wordId:string) {
   const content = await response.json();
   return content[0].userWord;
 }
-export { getUserWord, createUserWord };
+async function updateUserWord(
+  userId: string,
+  userToken: string,
+  wordId:string,
+  wordData: TUserWord,
+) {
+  const response = await fetch(`${DATABASE_LINK}/users/${userId}/words/${wordId}`, {
+    method: 'PUT',
+    headers: {
+      Authorization: `Bearer ${userToken}`,
+      Accept: 'application/json',
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify(wordData),
+  });
+  const content = await response.json();
+  return content;
+};
+export { getUserWord, createUserWord, updateUserWord };

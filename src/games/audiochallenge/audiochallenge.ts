@@ -1,11 +1,13 @@
 import './styles.scss';
 import { StartPopUpLayout, gameLayout, questionLayout } from './create-html';
-import { DATABASE_LINK, ALL_PAGES, LIVES_GAME } from '../../common/constants';
-import { TWordSimple } from '../../common/baseTypes';
+import {
+  DATABASE_LINK, ALL_PAGES, LIVES_GAME, CORRECT_COUNT, CORRECT_COUNT_HARD,
+} from '../../common/constants';
+import { TWordSimple, TUserWord } from '../../common/baseTypes';
 import Question from './question';
 import AudioChallengeResults from './results';
 import Store from '../../store/store';
-import { getUserWord, createUserWord } from '../../api/userWords';
+import { getUserWord, createUserWord, updateUserWord } from '../../api/userWords';
 
 async function getWords(level:number, pageNumber?: number) {
   let page:number;
@@ -70,11 +72,11 @@ export default class AudioChallenge {
     document.onkeydown = (e) => { this.handleLevelKeyboard(e); };
 
     //  getCurrentPage()
-    console.log(' getAuthorized()', this.store.getAuthorized());
+    /* console.log(' getAuthorized()', this.store.getAuthorized());
     console.log(' getCurrentPage()', this.store.getCurrentPage());
     console.log(' getCurrentPageName', this.store.getCurrentPageName());
     console.log(' getCurrentPageNumber', this.store.getCurrentPageNumber());
-    console.log(' getUser', this.store.getUser());
+    console.log(' getUser', this.store.getUser()); */
     return this.element;
   }
 
@@ -199,11 +201,14 @@ export default class AudioChallenge {
   }
 
   async updateCorrectUserWord(word: TWordSimple) {
-    /* проверить является ли слово новым */
     const user = this.store.getUser();
-    const wordUser = await getUserWord(user.id, user.token, word.id);
-    console.log(wordUser);
-   /* const userWordData = {
+    const wordData = await getUserWord(user.id, user.token, word.id);
+    console.log(wordData);
+    let userWordData: TUserWord;
+    // новое слово
+    if (!wordData) {
+      this.newWords += 1;
+      userWordData = {
         difficulty: 'normal',
         optional: {
           correctCount: 1,
@@ -211,10 +216,25 @@ export default class AudioChallenge {
           totalCorrectCount: 1,
           totalIncorrectCount: 0,
         },
-      }; */
-
-
-
-    /* если является */
+      };
+      createUserWord(user.id, user.token, word.id, userWordData);
+    } else {
+      // обновить слово
+      wordData.optional.correctCount += 1;
+      wordData.optional.totalCorrectCount += 1;
+      if ((wordData.difficulty === 'normal' && wordData.optional.correctCount >= CORRECT_COUNT)
+      || (wordData.difficulty === 'hard' && wordData.optional.correctCount >= CORRECT_COUNT_HARD)) {
+        userWordData = {
+          difficulty: wordData.difficulty,
+          optional: {
+            correctCount: wordData.optional.correctCount,
+            isStudy: true,
+            totalCorrectCount: wordData.optional.totalCorrectCount,
+            totalIncorrectCount: wordData.optional.totalIncorrectCount,
+          },
+        };
+        updateUserWord(user.id, user.token, word.id, userWordData);
+      }
+    }
   }
 }
