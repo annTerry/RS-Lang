@@ -4,6 +4,8 @@ import { DATABASE_LINK, ALL_PAGES, LIVES_GAME } from '../../common/constants';
 import { TWordSimple } from '../../common/baseTypes';
 import Question from './question';
 import AudioChallengeResults from './results';
+import Store from '../../store/store';
+import { getUserWord, createUserWord } from '../../api/userWords';
 
 async function getWords(level:number, pageNumber?: number) {
   let page:number;
@@ -38,6 +40,10 @@ export default class AudioChallenge {
 
   seriesResult: number;
 
+  store: Store;
+
+  newWords: number;
+
   constructor() {
     this.group = -1;
     this.page = undefined;
@@ -48,6 +54,8 @@ export default class AudioChallenge {
     this.livesInGame = LIVES_GAME;
     this.seriesNow = 0;
     this.seriesResult = 0;
+    this.store = new Store();
+    this.newWords = 0;
   }
 
   create():HTMLElement {
@@ -60,6 +68,13 @@ export default class AudioChallenge {
     btnLevels.addEventListener('click', (e: Event) => { this.handleLevelBtn(e); });
     // выбор уровня с клавиатуры
     document.onkeydown = (e) => { this.handleLevelKeyboard(e); };
+
+    //  getCurrentPage()
+    console.log(' getAuthorized()', this.store.getAuthorized());
+    console.log(' getCurrentPage()', this.store.getCurrentPage());
+    console.log(' getCurrentPageName', this.store.getCurrentPageName());
+    console.log(' getCurrentPageNumber', this.store.getCurrentPageNumber());
+    console.log(' getUser', this.store.getUser());
     return this.element;
   }
 
@@ -91,7 +106,7 @@ export default class AudioChallenge {
     skipBtn.addEventListener('click', () => { question.showAnswers(); });
     // кнопка далее
     const nextBtn = <HTMLElement> document.getElementById('next');
-    nextBtn.addEventListener('click', () => { this.handleNextBtn(question); });
+    nextBtn.addEventListener('click', async () => { await this.handleNextBtn(question); });
     // клавиатура
     document.onkeydown = (e) => { this.handleKeyboard(e, question); };
   }
@@ -106,15 +121,22 @@ export default class AudioChallenge {
     return Array.from(randomAnswers);
   }
 
-  handleNextBtn(question: Question) {
+  async handleNextBtn(question: Question) {
     if (question.isCorrect) {
       this.correctAnswers.push(question.word);
       this.seriesNow += 1;
+      if (this.store.getAuthorized()) {
+        console.log('обновить слово');
+        await this.updateCorrectUserWord(question.word);
+      }
     } else {
       this.wrongAnswers.push(question.word);
       this.livesInGame -= 1;
       this.getSeriesResult();
       this.drawLives();
+      if (this.store.getAuthorized()) {
+        console.log('обновить слово');
+      }
     }
 
     if ((this.livesInGame > 0) && (this.questionNum < this.wordsArray.length - 1)) {
@@ -149,7 +171,6 @@ export default class AudioChallenge {
       question.play();
     }
     const answerNumber = Number(e.key);
-    // if ((e.key === '1') || (e.key === '2') || (e.key === '3') || (e.key === '4') || (e.key === '5')) {
     if (answerNumber > 0 && answerNumber < 6) {
       e.preventDefault();
       question.showAnswers();
@@ -175,5 +196,25 @@ export default class AudioChallenge {
       this.wordsArray = await getWords(group, this.page);
       this.startGame();
     }
+  }
+
+  async updateCorrectUserWord(word: TWordSimple) {
+    /* проверить является ли слово новым */
+    const user = this.store.getUser();
+    const wordUser = await getUserWord(user.id, user.token, word.id);
+    console.log(wordUser);
+   /* const userWordData = {
+        difficulty: 'normal',
+        optional: {
+          correctCount: 1,
+          isStudy: false,
+          totalCorrectCount: 1,
+          totalIncorrectCount: 0,
+        },
+      }; */
+
+
+
+    /* если является */
   }
 }
