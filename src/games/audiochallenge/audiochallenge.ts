@@ -110,7 +110,7 @@ export default class AudioChallenge {
     const nextBtn = <HTMLElement> document.getElementById('next');
     nextBtn.addEventListener('click', async () => { await this.handleNextBtn(question); });
     // клавиатура
-    document.onkeydown = (e) => { this.handleKeyboard(e, question); };
+    document.onkeydown = async (e) => { await this.handleKeyboard(e, question); };
   }
 
   getRandomAnswers(wordsArray:Array<TWordSimple>, word:string):Array<string> {
@@ -128,7 +128,6 @@ export default class AudioChallenge {
       this.correctAnswers.push(question.word);
       this.seriesNow += 1;
       if (this.store.getAuthorized()) {
-        console.log('обновить слово');
         await this.updateCorrectUserWord(question.word);
       }
     } else {
@@ -167,7 +166,7 @@ export default class AudioChallenge {
     liveItem.classList.add('live-item_over');
   }
 
-  handleKeyboard(e:KeyboardEvent, question: Question) {
+  async handleKeyboard(e:KeyboardEvent, question: Question) {
     if (e.key === ' ') {
       e.preventDefault();
       question.play();
@@ -186,7 +185,7 @@ export default class AudioChallenge {
       }
     } else if (e.key === 'ArrowRight') {
       e.preventDefault();
-      this.handleNextBtn(question);
+      await this.handleNextBtn(question);
     }
   }
 
@@ -203,7 +202,6 @@ export default class AudioChallenge {
   async updateCorrectUserWord(word: TWordSimple) {
     const user = this.store.getUser();
     const wordData = await getUserWord(user.id, user.token, word.id);
-    console.log(wordData);
     let userWordData: TUserWord;
     // новое слово
     if (!wordData) {
