@@ -149,7 +149,6 @@ export default class AudioChallenge {
       question.play();
     }
     const answerNumber = Number(e.key);
-    // if ((e.key === '1') || (e.key === '2') || (e.key === '3') || (e.key === '4') || (e.key === '5')) {
     if (answerNumber > 0 && answerNumber < 6) {
       e.preventDefault();
       question.showAnswers();
