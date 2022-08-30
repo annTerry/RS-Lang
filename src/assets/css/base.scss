@@ -21,3 +21,55 @@ body {
   margin: auto;
   padding: 0 1rem;
 }
+
+a {
+  color: #0d6efd;
+  &:hover {
+    color: #094bb0;
+  }
+}
+
+.text-center {
+  text-align: center;
+}
+.text-left {
+  text-align: left;
+}
+.text-right {
+  text-align: right;
+}
+
+.alert {
+  position: relative;
+  padding: 0.75rem 1.25rem;
+  margin-bottom: 1rem;
+  border: 1px solid transparent;
+  border-radius: 0.25rem;
+  > ul {
+    margin: 0;
+    padding-left: 0.8rem;
+  }
+}
+.alert_success {
+  color: #155724;
+  background-color: #d4edda;
+  border-color: #c3e6cb;
+}
+.alert_warning {
+  color: #856404;
+  background-color: #fff3cd;
+  border-color: #ffeeba;
+}
+.alert_danger {
+  color: #721c24;
+  background-color: #f8d7da;
+  border-color: #f5c6cb;
+}
+
+.hide {
+  display: none !important
+}
+
+.w-100 {
+  width: 100%;
+}
