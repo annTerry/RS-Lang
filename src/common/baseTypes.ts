@@ -33,6 +33,7 @@ enum PagesCategory {
 
 type TPage = {
   page:PagesCategory,
+  part?:number,
   number?:number
 };
 
@@ -40,6 +41,10 @@ type TWordStat = {
   'hard'?:boolean,
   'positive':number,
   'negative':number,
+};
+type TPageAndPart = {
+  part?:number,
+  number?:number
 };
 
 type TWordObject = {
@@ -52,7 +57,8 @@ type TStoreBase = {
   username?: string,
   token?: string,
   currentPage: TPage,
-  words?: TWordObject
+  words?: TWordObject,
+  textBook?: TPageAndPart,
 };
 
 type GetWordsFunction = (data:Array<TWordSimple>) => void;
@@ -62,7 +68,7 @@ type StoreCallbackFunction = ()=>void;
 type TErrorMessage = {
   path?: string,
   message?: string,
-}
+};
 
 type TAlertType = 'success' | 'warning' | 'danger';
 
@@ -70,5 +76,5 @@ export {
   TWordSimple, TUser, GetWordsFunction, PostUserFunction,
   TStoreBase, TPage, PagesCategory, TWordStat, TWordObject,
   TAlertType, TErrorMessage,
-  StoreCallbackFunction,
+  StoreCallbackFunction, TPageAndPart,
 };

@@ -1,4 +1,5 @@
 import Store from 'src/store/store';
+import Router from '@src/api/router';
 import './menu.scss';
 
 type MenuItem = {
@@ -9,8 +10,11 @@ type MenuItem = {
 export default class Menu {
   store:Store;
 
-  constructor(store: Store) {
+  router:Router;
+
+  constructor(store: Store, router: Router) {
     this.store = store;
+    this.router = router;
     this.create();
   }
 
@@ -35,9 +39,8 @@ export default class Menu {
     const links = document.getElementsByTagName('a');
     for (let j = 0; j < links.length; j += 1) {
       links[j].addEventListener('click', () => {
-        let clearLink = links[j].getAttribute('href') || '';
-        clearLink = clearLink.replace('#', '');
-        this.store.setCurrentPage(clearLink);
+        const linkHref = links[j].getAttribute('href') as string;
+        this.router.setNewPage(Router.newPageName(linkHref));
       });
     }
   }

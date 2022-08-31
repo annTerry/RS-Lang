@@ -1,6 +1,7 @@
 const DATABASE_LINK = 'https://react-rs-learnwords.herokuapp.com';
 // const DATABASE_LINK = 'http://127.0.0.1:3000';
 const TITLE = 'RS-Lang';
+const TEXTBOOK_PARTS = 6;
 const LIVES_GAME = 5;
 const ALL_PAGES = 30;
 
@@ -12,5 +13,5 @@ const PAGE_IDS = {
 
 export {
   DATABASE_LINK, TITLE, ALL_PAGES, LIVES_GAME,
-  PAGE_IDS,
+  PAGE_IDS, TEXTBOOK_PARTS,
 };

@@ -2,7 +2,7 @@ import Router from '../api/router';
 import AudioChallenge from '../games/audiochallenge/audiochallenge';
 import Store from '../store/store';
 import MainPage from './mainPage';
-import Textbook from './textBook';
+import Textbook from './textbook/textBook';
 
 const PAGES_TYPES = {
   Main: MainPage,
@@ -25,8 +25,8 @@ export default class PageManager {
     this.store = store;
     this.router = router;
     this.pageClass = this.setPages();
-    this.mainElement = document.getElementsByTagName('main')[0] as HTMLElement;
-    this.mainElement.innerHTML = '';
+    this.mainElement = document.createElement('main');
+    document.body.append(this.mainElement);
     store.addWatcher('currentPage', () => { this.resetPage(); });
     this.resetPage();
   }
@@ -45,7 +45,8 @@ export default class PageManager {
   setPages():TPageClass {
     const pageObj:TPageClass = {};
     Object.entries(PAGES_TYPES).forEach((entry) => {
-      pageObj[entry[0] as string] = new entry[1]();
+      const currentType = entry[0] as string;
+      pageObj[currentType] = new entry[1](this.store);
     });
     return pageObj;
   }

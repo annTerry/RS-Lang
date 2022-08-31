@@ -1,0 +1,23 @@
+.part-container {
+  display: flex;
+  justify-content: space-evenly;
+  margin: 20px 0;
+  padding: 0;
+}
+.textBook-part-name {
+  list-style-type: none;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  &:not(.Active) {
+    cursor: pointer;
+    a {
+      font-weight: bold;
+    }
+  }
+}
+.textBook_part_link
+{
+  text-decoration: none;
+  font-size: 1.4em;
+}
