@@ -8,6 +8,7 @@ import Question from './question';
 import AudioChallengeResults from './results';
 import Store from '../../store/store';
 import { getUserWord, createUserWord, updateUserWord } from '../../api/userWords';
+import { updateUserStatistic, getUserStatistic } from '../../api/userStatistic';
 
 async function getWords(level:number, pageNumber?: number) {
   let page:number;
@@ -128,13 +129,13 @@ export default class AudioChallenge {
         await this.updateCorrectUserWord(question.word);
       }
     } else {
+      if (this.store.getAuthorized()) {
+        await this.updateIncorrectUserWord(question.word);
+      }
       this.wrongAnswers.push(question.word);
       this.livesInGame -= 1;
       this.getSeriesResult();
       this.drawLives();
-      if (this.store.getAuthorized()) {
-        await this.updateIncorrectUserWord(question.word);
-      }
     }
 
     if ((this.livesInGame > 0) && (this.questionNum < this.wordsArray.length - 1)) {
@@ -148,6 +149,52 @@ export default class AudioChallenge {
         this.wrongAnswers,
         this.seriesResult,
       );
+      if (this.store.getAuthorized()) {
+        const statistic = await getUserStatistic(
+          this.store.getUser().id,
+          this.store.getUser().token,
+        );
+
+        if (!statistic) {
+          const statisticObj = {
+            learnedWords: 0,
+            optional: {
+              audioChallenge: {
+                correctAnswers: this.correctAnswers.length,
+                wrongAnswers: this.wrongAnswers.length,
+                series: this.seriesResult,
+                newWords: this.newWords,
+              },
+            },
+          };
+          await updateUserStatistic(
+            this.store.getUser().id,
+            this.store.getUser().token,
+            statisticObj,
+          );
+        } else {
+          // console.log(' statistic', statistic);
+          const { id, ...statisticObj } = statistic;
+          // console.log('1', statisticObj);
+          statisticObj.optional.audioChallenge.correctAnswers += this.correctAnswers.length;
+          statisticObj.optional.audioChallenge.wrongAnswers += this.wrongAnswers.length;
+          statisticObj.optional.audioChallenge.series = (
+            this.seriesResult > statisticObj.optional.audioChallenge.series
+          ) ? this.seriesResult : statisticObj.optional.audioChallenge.series;
+          statisticObj.optional.audioChallenge.newWords += this.newWords;
+          // console.log('2', statisticObj);
+          await updateUserStatistic(
+            this.store.getUser().id,
+            this.store.getUser().token,
+            statisticObj,
+          );
+          const statistic1 = await getUserStatistic(
+            this.store.getUser().id,
+            this.store.getUser().token,
+          );
+          console.log('tatistic1', statistic1);
+        }
+      }
       result.start();
     }
   }
@@ -216,9 +263,12 @@ export default class AudioChallenge {
       // обновить слово
       wordData.optional.correctCount += 1;
       wordData.optional.totalCorrectCount += 1;
-      if ((wordData.difficulty === 'normal' && wordData.optional.correctCount >= CORRECT_COUNT)
-      || (wordData.difficulty === 'hard' && wordData.optional.correctCount >= CORRECT_COUNT_HARD)) {
+      if (wordData.difficulty === 'normal' && wordData.optional.correctCount >= CORRECT_COUNT) {
         wordData.optional.isStudy = true;
+      }
+      if (wordData.difficulty === 'hard' && wordData.optional.correctCount >= CORRECT_COUNT_HARD) {
+        wordData.optional.isStudy = true;
+        wordData.difficulty = 'normal';
       }
       updateUserWord(user.id, user.token, word.id, wordData);
     }

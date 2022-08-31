@@ -75,10 +75,21 @@ type TUserWord = {
     totalCorrectCount: number;
   },
 };
+type TUserStatistic = {
+  learnedWords: number,
+  optional: {
+    audioChallenge: {
+      correctAnswers: number;
+      wrongAnswers: number;
+      series: number;
+      newWords: number;
+    }
+  }
+};
 
 export {
   TWordSimple, TUser, GetWordsFunction, PostUserFunction,
   TStoreBase, TPage, PagesCategory, TWordStat, TWordObject,
   TAlertType, TErrorMessage,
-  StoreCallbackFunction, TUserWord,
+  StoreCallbackFunction, TUserWord, TUserStatistic,
 };
