@@ -71,10 +71,6 @@ export default class AudioChallenge {
     btnLevels.addEventListener('click', (e: Event) => { this.handleLevelBtn(e); });
     // выбор уровня с клавиатуры
     document.onkeydown = (e) => { this.handleLevelKeyboard(e); };
-
-    //  getCurrentPage()
-    console.log(' getAuthorized()', this.store.getAuthorized());
-    console.log(' getUser', this.store.getUser());
     return this.element;
   }
 
@@ -188,11 +184,6 @@ export default class AudioChallenge {
             this.store.getUser().token,
             statisticObj,
           );
-          const statistic1 = await getUserStatistic(
-            this.store.getUser().id,
-            this.store.getUser().token,
-          );
-          console.log('tatistic1', statistic1);
         }
       }
       result.start();

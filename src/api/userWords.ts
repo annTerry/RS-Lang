@@ -20,7 +20,7 @@ async function createUserWord(
     },
   );
   const content = await response.json();
-  console.log('1', content);
+  return content;
 }
 
 async function getUserWord(userId: string, userToken: string, wordId:string) {
@@ -51,5 +51,5 @@ async function updateUserWord(
   });
   const content = await response.json();
   return content;
-};
+}
 export { getUserWord, createUserWord, updateUserWord };
