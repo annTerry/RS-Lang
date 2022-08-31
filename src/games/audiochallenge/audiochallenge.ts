@@ -72,11 +72,8 @@ export default class AudioChallenge {
     document.onkeydown = (e) => { this.handleLevelKeyboard(e); };
 
     //  getCurrentPage()
-    /* console.log(' getAuthorized()', this.store.getAuthorized());
-    console.log(' getCurrentPage()', this.store.getCurrentPage());
-    console.log(' getCurrentPageName', this.store.getCurrentPageName());
-    console.log(' getCurrentPageNumber', this.store.getCurrentPageNumber());
-    console.log(' getUser', this.store.getUser()); */
+    console.log(' getAuthorized()', this.store.getAuthorized());
+    console.log(' getUser', this.store.getUser());
     return this.element;
   }
 
@@ -136,7 +133,7 @@ export default class AudioChallenge {
       this.getSeriesResult();
       this.drawLives();
       if (this.store.getAuthorized()) {
-        console.log('обновить слово');
+        await this.updateIncorrectUserWord(question.word);
       }
     }
 
@@ -202,11 +199,10 @@ export default class AudioChallenge {
   async updateCorrectUserWord(word: TWordSimple) {
     const user = this.store.getUser();
     const wordData = await getUserWord(user.id, user.token, word.id);
-    let userWordData: TUserWord;
     // новое слово
     if (!wordData) {
       this.newWords += 1;
-      userWordData = {
+      const userWordData = {
         difficulty: 'normal',
         optional: {
           correctCount: 1,
@@ -222,17 +218,37 @@ export default class AudioChallenge {
       wordData.optional.totalCorrectCount += 1;
       if ((wordData.difficulty === 'normal' && wordData.optional.correctCount >= CORRECT_COUNT)
       || (wordData.difficulty === 'hard' && wordData.optional.correctCount >= CORRECT_COUNT_HARD)) {
-        userWordData = {
-          difficulty: wordData.difficulty,
-          optional: {
-            correctCount: wordData.optional.correctCount,
-            isStudy: true,
-            totalCorrectCount: wordData.optional.totalCorrectCount,
-            totalIncorrectCount: wordData.optional.totalIncorrectCount,
-          },
-        };
-        updateUserWord(user.id, user.token, word.id, userWordData);
+        wordData.optional.isStudy = true;
       }
+      updateUserWord(user.id, user.token, word.id, wordData);
+    }
+  }
+
+  async updateIncorrectUserWord(word: TWordSimple) {
+    const user = this.store.getUser();
+    const wordData = await getUserWord(user.id, user.token, word.id);
+    let userWordData: TUserWord;
+    // новое слово
+    if (!wordData) {
+      this.newWords += 1;
+      userWordData = {
+        difficulty: 'normal',
+        optional: {
+          correctCount: 0,
+          isStudy: false,
+          totalCorrectCount: 0,
+          totalIncorrectCount: 1,
+        },
+      };
+      createUserWord(user.id, user.token, word.id, userWordData);
+    } else {
+      // обновить слово
+      wordData.optional.correctCount = 0;
+      wordData.optional.totalIncorrectCount += 1;
+      if (wordData.isStudy) {
+        wordData.isStudy = false;
+      }
+      updateUserWord(user.id, user.token, word.id, wordData);
     }
   }
 }
