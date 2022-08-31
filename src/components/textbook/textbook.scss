@@ -21,3 +21,17 @@
   text-decoration: none;
   font-size: 1.4em;
 }
+
+.pages-container {
+  display: flex;
+  justify-content: space-evenly;
+  margin: 20px 0;
+  padding: 0;
+  .textBook-page-link {
+    font-size: 1.1em;
+    list-style-type: none;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  }
+}
