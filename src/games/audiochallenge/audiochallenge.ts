@@ -158,43 +158,6 @@ export default class AudioChallenge {
       );
       if (this.store.getAuthorized()) {
         await this.setStatisticGame();
-      /* const statistic = await getUserStatistic(
-          this.store.getUser().id,
-          this.store.getUser().token,
-        );
-        if ((!statistic) || (!isDataToday(statistic.optional.date))) {
-          const statisticObj = {
-            learnedWords: 0,
-            optional: {
-              date: new Date().toLocaleDateString(),
-              audioChallenge: {
-                correctAnswers: this.correctAnswers.length,
-                wrongAnswers: this.wrongAnswers.length,
-                series: this.seriesResult,
-                newWords: this.newWords,
-              },
-            },
-          };
-          await updateUserStatistic(
-            this.store.getUser().id,
-            this.store.getUser().token,
-            statisticObj,
-          );
-        } else {
-          const { id, ...statisticObj } = statistic;
-          statisticObj.learnedWords += this.learnedWords;
-          statisticObj.optional.audioChallenge.correctAnswers += this.correctAnswers.length;
-          statisticObj.optional.audioChallenge.wrongAnswers += this.wrongAnswers.length;
-          statisticObj.optional.audioChallenge.series = (
-            this.seriesResult > statisticObj.optional.audioChallenge.series
-          ) ? this.seriesResult : statisticObj.optional.audioChallenge.series;
-          statisticObj.optional.audioChallenge.newWords += this.newWords;
-          await updateUserStatistic(
-            this.store.getUser().id,
-            this.store.getUser().token,
-            statisticObj,
-          );
-        } */
       }
       result.start();
     }
