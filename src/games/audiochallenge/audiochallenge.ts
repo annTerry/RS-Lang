@@ -52,6 +52,8 @@ export default class AudioChallenge {
 
   newWords: number;
 
+  learnedWords: number;
+
   constructor() {
     this.group = -1;
     this.page = undefined;
@@ -64,6 +66,7 @@ export default class AudioChallenge {
     this.seriesResult = 0;
     this.store = new Store();
     this.newWords = 0;
+    this.learnedWords = 0;
   }
 
   create():HTMLElement {
@@ -154,7 +157,8 @@ export default class AudioChallenge {
         this.seriesResult,
       );
       if (this.store.getAuthorized()) {
-        const statistic = await getUserStatistic(
+        await this.setStatisticGame();
+      /* const statistic = await getUserStatistic(
           this.store.getUser().id,
           this.store.getUser().token,
         );
@@ -178,6 +182,7 @@ export default class AudioChallenge {
           );
         } else {
           const { id, ...statisticObj } = statistic;
+          statisticObj.learnedWords += this.learnedWords;
           statisticObj.optional.audioChallenge.correctAnswers += this.correctAnswers.length;
           statisticObj.optional.audioChallenge.wrongAnswers += this.wrongAnswers.length;
           statisticObj.optional.audioChallenge.series = (
@@ -189,7 +194,7 @@ export default class AudioChallenge {
             this.store.getUser().token,
             statisticObj,
           );
-        }
+        } */
       }
       result.start();
     }
@@ -261,10 +266,12 @@ export default class AudioChallenge {
       wordData.optional.totalCorrectCount += 1;
       if (wordData.difficulty === 'normal' && wordData.optional.correctCount >= CORRECT_COUNT) {
         wordData.optional.isStudy = true;
+        this.learnedWords += 1;
       }
       if (wordData.difficulty === 'hard' && wordData.optional.correctCount >= CORRECT_COUNT_HARD) {
         wordData.optional.isStudy = true;
         wordData.difficulty = 'normal';
+        this.learnedWords += 1;
       }
       updateUserWord(user.id, user.token, word.id, wordData);
     }
@@ -293,8 +300,49 @@ export default class AudioChallenge {
       wordData.optional.totalIncorrectCount += 1;
       if (wordData.isStudy) {
         wordData.isStudy = false;
+        this.learnedWords -= 1;
       }
       updateUserWord(user.id, user.token, word.id, wordData);
+    }
+  }
+
+  async setStatisticGame() {
+    const statistic = await getUserStatistic(
+      this.store.getUser().id,
+      this.store.getUser().token,
+    );
+    if ((!statistic) || (!isDataToday(statistic.optional.date))) {
+      const statisticObj = {
+        learnedWords: 0,
+        optional: {
+          date: new Date().toLocaleDateString(),
+          audioChallenge: {
+            correctAnswers: this.correctAnswers.length,
+            wrongAnswers: this.wrongAnswers.length,
+            series: this.seriesResult,
+            newWords: this.newWords,
+          },
+        },
+      };
+      await updateUserStatistic(
+        this.store.getUser().id,
+        this.store.getUser().token,
+        statisticObj,
+      );
+    } else {
+      const { id, ...statisticObj } = statistic;
+      statisticObj.learnedWords += this.learnedWords;
+      statisticObj.optional.audioChallenge.correctAnswers += this.correctAnswers.length;
+      statisticObj.optional.audioChallenge.wrongAnswers += this.wrongAnswers.length;
+      statisticObj.optional.audioChallenge.series = (
+        this.seriesResult > statisticObj.optional.audioChallenge.series
+      ) ? this.seriesResult : statisticObj.optional.audioChallenge.series;
+      statisticObj.optional.audioChallenge.newWords += this.newWords;
+      await updateUserStatistic(
+        this.store.getUser().id,
+        this.store.getUser().token,
+        statisticObj,
+      );
     }
   }
 }
