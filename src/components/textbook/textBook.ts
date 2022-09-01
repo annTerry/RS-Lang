@@ -1,10 +1,13 @@
 import './textbook.scss';
 import Store from '@src/store/store';
 import { TEXTBOOK_PARTS, ALL_PAGES } from '@common/constants';
+import GetData from '@src/api/getData';
 import MainPage from '../mainPage';
 
 export default class Textbook extends MainPage {
   parts!: HTMLElement;
+
+  wordsSection!: HTMLElement;
 
   pages!:HTMLElement;
 
@@ -18,19 +21,39 @@ export default class Textbook extends MainPage {
 
   redrawNavigation() {
     if (this.store.getCurrentPageName() === 'Textbook') {
-      this.element.removeChild(this.parts);
-      this.element.removeChild(this.pages);
+      if (this.parts !== undefined) this.element.removeChild(this.parts);
+      if (this.pages !== undefined) this.element.removeChild(this.pages);
+      if (this.wordsSection !== undefined) this.element.removeChild(this.wordsSection);
       this.setPartsAndPages();
     }
+  }
+
+  async rendWords(currentPart = 0, currentPage = 0):Promise<HTMLElement> {
+    const sectionWordElement = document.createElement('section');
+    sectionWordElement.classList.add('textbook-words-page');
+    sectionWordElement.classList.add(`textbook-part_${currentPart}`);
+    await GetData.getData(`words?group=${currentPart}&&page=${currentPage}`, (result) => {
+      result.forEach((element) => {
+        const oneWord = document.createElement('div');
+        oneWord.classList.add('textbook-one_word-element');
+        oneWord.textContent = element.word;
+        sectionWordElement.append(oneWord);
+      });
+    });
+    return sectionWordElement;
   }
 
   setPartsAndPages() {
     const currentPart = this.store.getCurrentPartNumber();
     const currentPage = this.store.getCurrentPageNumber();
     this.parts = this.drawParts(currentPart);
-    this.pages = this.drawPages(currentPage, currentPart);
-    this.element.append(this.parts);
-    this.element.append(this.pages);
+    this.pages = this.drawPages(currentPart, currentPage);
+    this.rendWords(currentPart, currentPage).then((element) => {
+      this.wordsSection = element;
+      this.element.append(this.parts);
+      this.element.append(this.wordsSection);
+      this.element.append(this.pages);
+    });
   }
 
   drawParts(currentPart = 0):HTMLElement {
@@ -48,9 +71,6 @@ export default class Textbook extends MainPage {
       const linkData = document.createElement('a');
       linkData.classList.add('textBook_part_link');
       linkData.setAttribute('href', `#Textbook_${i}`);
-      /*       thisPart.addEventListener('click', () => {
-        this.store.setCurrentPage('Textbook', i);
-      }); */
       linkData.textContent = `Раздел ${i + 1}`;
       thisPart.append(linkData);
       partBaseElement.append(thisPart);
@@ -59,7 +79,7 @@ export default class Textbook extends MainPage {
     return partElement;
   }
 
-  drawPages(currentPage = 0, currentPart = 0):HTMLElement {
+  drawPages(currentPart = 0, currentPage = 0):HTMLElement {
     const pageElement = document.createElement('section');
     pageElement.classList.add('pagess-wrapper');
     const pageBaseElement = document.createElement('ul');
@@ -73,9 +93,6 @@ export default class Textbook extends MainPage {
         const linkData = document.createElement('a');
         linkData.classList.add('textBook_page_link');
         linkData.setAttribute('href', `#Textbook_${currentPart}_${element[1]}`);
-        /*         thisPart.addEventListener('click', () => {
-          this.store.setCurrentPage('Textbook', currentPart, element[1] as number);
-        }); */
         linkData.textContent = element[0].toString();
         thisPart.append(linkData);
       } else {
@@ -89,6 +106,7 @@ export default class Textbook extends MainPage {
 
   dataForPagesRender(currentPage:number):Array<Array<string | number>> {
     const pagesLink = [];
+
     if (currentPage > 0) pagesLink.push(['Предыдущая', currentPage - 1]);
     for (let i = 0; i < 2; i += 1) {
       if (currentPage === i) pagesLink.push([(i + 1).toString(), -1]);

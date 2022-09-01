@@ -2,7 +2,7 @@ import { DATABASE_LINK } from '../common/constants';
 import { TWordSimple, GetWordsFunction } from '../common/baseTypes';
 
 export default class GetData {
-  async getData(dataType:string, fn:GetWordsFunction) {
+  static async getData(dataType:string, fn:GetWordsFunction) {
     await fetch(`${DATABASE_LINK}/${dataType}`).then((response) => response.json()).then((data:JSON) => {
       const returnData: Array<TWordSimple> = JSON.parse(JSON.stringify(data));
       fn(returnData);
