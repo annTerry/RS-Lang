@@ -35,3 +35,24 @@
   align-items: center;
   }
 }
+
+.sound-icon{
+  width: 25px;
+  height: 20px;
+  background-image:url('../../assets/svg/sound-small1.svg');
+  background-repeat: no-repeat;
+  background-size: contain;
+  background-position: center;
+  cursor: pointer;
+}
+
+.textbook-one_word-element{
+  display: flex;
+  align-items: center;
+  gap:10px;
+  margin-top: 5px;
+}
+
+.word__text{
+  font-weight: bold;
+}

@@ -1,6 +1,6 @@
 import './textbook.scss';
 import Store from '@src/store/store';
-import { TEXTBOOK_PARTS, ALL_PAGES } from '@common/constants';
+import { TEXTBOOK_PARTS, ALL_PAGES, DATABASE_LINK } from '@common/constants';
 import GetData from '@src/api/getData';
 import MainPage from '../mainPage';
 
@@ -36,11 +36,37 @@ export default class Textbook extends MainPage {
       result.forEach((element) => {
         const oneWord = document.createElement('div');
         oneWord.classList.add('textbook-one_word-element');
-        oneWord.textContent = element.word;
+        const audioElement = document.createElement('div');
+        audioElement.classList.add('sound-icon');
+        audioElement.addEventListener('click', () => {
+          const audio = new Audio();
+          audio.src = `${DATABASE_LINK}/${element.audio}`;
+          audio.play();
+        });
+        oneWord.append(audioElement);
+        const wordElement = document.createElement('span');
+        wordElement.classList.add('word__text');
+        wordElement.textContent = element.word;
+        oneWord.append(wordElement);
+        const wordTranslate = document.createElement('span');
+        wordTranslate.classList.add('word__translate');
+        wordTranslate.textContent = element.wordTranslate;
+        oneWord.append(wordTranslate);
+        if (this.store.getAuthorized()) {
+          oneWord.classList.add('word-with-action');
+          oneWord.addEventListener('click', () => {
+            this.hardNotHard(element.id);
+          });
+        }
         sectionWordElement.append(oneWord);
       });
     });
     return sectionWordElement;
+  }
+
+  hardNotHard(id:string) {
+    // todo add.or delete word from hard.words
+    console.log(id);
   }
 
   setPartsAndPages() {
