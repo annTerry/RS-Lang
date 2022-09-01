@@ -62,13 +62,35 @@ type StoreCallbackFunction = ()=>void;
 type TErrorMessage = {
   path?: string,
   message?: string,
-}
+};
 
 type TAlertType = 'success' | 'warning' | 'danger';
+
+type TUserWord = {
+  difficulty: string
+  optional: {
+    isStudy: boolean,
+    correctCount: number;
+    totalIncorrectCount: number;
+    totalCorrectCount: number;
+  },
+};
+type TUserStatistic = {
+  learnedWords: number,
+  optional: {
+    date: string;
+    audioChallenge: {
+      correctAnswers: number;
+      wrongAnswers: number;
+      series: number;
+      newWords: number;
+    }
+  }
+};
 
 export {
   TWordSimple, TUser, GetWordsFunction, PostUserFunction,
   TStoreBase, TPage, PagesCategory, TWordStat, TWordObject,
   TAlertType, TErrorMessage,
-  StoreCallbackFunction,
+  StoreCallbackFunction, TUserWord, TUserStatistic,
 };
