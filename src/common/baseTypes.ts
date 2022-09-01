@@ -78,6 +78,7 @@ type TUserWord = {
 type TUserStatistic = {
   learnedWords: number,
   optional: {
+    date: string;
     audioChallenge: {
       correctAnswers: number;
       wrongAnswers: number;

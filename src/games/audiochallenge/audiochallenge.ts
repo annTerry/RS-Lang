@@ -22,6 +22,11 @@ async function getWords(level:number, pageNumber?: number) {
   return wordsArray;
 }
 
+function isDataToday(date: string) {
+  const dateNow = new Date().toLocaleDateString();
+  return (date === dateNow);
+}
+
 export default class AudioChallenge {
   group:number;
 
@@ -65,6 +70,9 @@ export default class AudioChallenge {
     this.element.classList.add('audio-challenge');
     const gameWrapper = '<div class="games-wrapper"></div>';
     this.element.innerHTML = gameWrapper;
+    // скрываем footer
+    const footer = <HTMLElement> document.getElementsByClassName('footer')[0];
+    footer.classList.add('conceal');
     // если пришли с главной страницы
     this.drawLayout(StartPopUpLayout, 'games-wrapper');
     const btnLevels = <HTMLElement> this.element.getElementsByClassName('buttons-levels-wrapper')[0];
@@ -150,11 +158,11 @@ export default class AudioChallenge {
           this.store.getUser().id,
           this.store.getUser().token,
         );
-
-        if (!statistic) {
+        if ((!statistic) || (!isDataToday(statistic.optional.date))) {
           const statisticObj = {
             learnedWords: 0,
             optional: {
+              date: new Date().toLocaleDateString(),
               audioChallenge: {
                 correctAnswers: this.correctAnswers.length,
                 wrongAnswers: this.wrongAnswers.length,
@@ -169,16 +177,13 @@ export default class AudioChallenge {
             statisticObj,
           );
         } else {
-          // console.log(' statistic', statistic);
           const { id, ...statisticObj } = statistic;
-          // console.log('1', statisticObj);
           statisticObj.optional.audioChallenge.correctAnswers += this.correctAnswers.length;
           statisticObj.optional.audioChallenge.wrongAnswers += this.wrongAnswers.length;
           statisticObj.optional.audioChallenge.series = (
             this.seriesResult > statisticObj.optional.audioChallenge.series
           ) ? this.seriesResult : statisticObj.optional.audioChallenge.series;
           statisticObj.optional.audioChallenge.newWords += this.newWords;
-          // console.log('2', statisticObj);
           await updateUserStatistic(
             this.store.getUser().id,
             this.store.getUser().token,
