@@ -16,20 +16,19 @@ export default class Router {
 
   static getPartAndPage(partNumber?:number, pageNumber?:number):TPageAndPart {
     const data:TPageAndPart = { part: partNumber, number: pageNumber };
-    if (partNumber !== undefined) {
-      const queryStr = window.location.hash;
-      if (queryStr.includes('_')) {
-        const queryStrParams = queryStr.split('_');
-        if (queryStrParams.length > 1) data.part = +queryStrParams[1];
-        if (queryStrParams.length > 2) data.number = +queryStrParams[2];
-      }
+    const queryStr = window.location.hash;
+    if (queryStr.includes('_')) {
+      const queryStrParams = queryStr.split('_');
+      if (queryStrParams.length > 1) data.part = +queryStrParams[1];
+      if (queryStrParams.length > 2) data.number = +queryStrParams[2];
     }
     return data;
   }
 
   static newPageName(pageName = 'Main') {
     const urlPageName = window.location.hash || pageName;
-    return urlPageName.replace('#', '');
+    const pageClear = urlPageName.split('_');
+    return pageClear[0].replace('#', '');
   }
 
   newPage(pageName:string, partNumber?:number, pageNumber?:number) {

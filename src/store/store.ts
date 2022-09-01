@@ -57,6 +57,10 @@ export default class Store {
     return this.store.currentPage.number || 0;
   }
 
+  getCurrentPartNumber():number {
+    return this.store.currentPage.part || 0;
+  }
+
   getUser() {
     return {
       id: this.store.uid,

@@ -36,13 +36,13 @@ export default class Menu {
         ${this.renderLinks()}
       </ul>
     `);
-    const links = document.getElementsByTagName('a');
+    /*  const links = document.getElementsByTagName('a');
     for (let j = 0; j < links.length; j += 1) {
       links[j].addEventListener('click', () => {
         const linkHref = links[j].getAttribute('href') as string;
         this.router.setNewPage(Router.newPageName(linkHref));
       });
-    }
+    } */
   }
 
   /**

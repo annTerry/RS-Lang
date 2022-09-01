@@ -28,6 +28,9 @@ export default class PageManager {
     this.mainElement = document.createElement('main');
     document.body.append(this.mainElement);
     store.addWatcher('currentPage', () => { this.resetPage(); });
+    window.addEventListener('hashchange', () => {
+      this.router.setNewPage();
+    });
     this.resetPage();
   }
 

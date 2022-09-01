@@ -4,10 +4,33 @@ import { TEXTBOOK_PARTS, ALL_PAGES } from '@common/constants';
 import MainPage from '../mainPage';
 
 export default class Textbook extends MainPage {
+  parts!: HTMLElement;
+
+  pages!:HTMLElement;
+
   constructor(store:Store) {
     super(store, 'Textbook');
-    this.element.append(this.drawParts());
-    this.element.append(this.drawPages());
+    this.setPartsAndPages();
+    this.store.addWatcher('currentPage', () => {
+      this.redrawNavigation();
+    });
+  }
+
+  redrawNavigation() {
+    if (this.store.getCurrentPageName() === 'Textbook') {
+      this.element.removeChild(this.parts);
+      this.element.removeChild(this.pages);
+      this.setPartsAndPages();
+    }
+  }
+
+  setPartsAndPages() {
+    const currentPart = this.store.getCurrentPartNumber();
+    const currentPage = this.store.getCurrentPageNumber();
+    this.parts = this.drawParts(currentPart);
+    this.pages = this.drawPages(currentPage, currentPart);
+    this.element.append(this.parts);
+    this.element.append(this.pages);
   }
 
   drawParts(currentPart = 0):HTMLElement {
@@ -25,9 +48,9 @@ export default class Textbook extends MainPage {
       const linkData = document.createElement('a');
       linkData.classList.add('textBook_part_link');
       linkData.setAttribute('href', `#Textbook_${i}`);
-      thisPart.addEventListener('click', () => {
+      /*       thisPart.addEventListener('click', () => {
         this.store.setCurrentPage('Textbook', i);
-      });
+      }); */
       linkData.textContent = `Раздел ${i + 1}`;
       thisPart.append(linkData);
       partBaseElement.append(thisPart);
@@ -50,9 +73,9 @@ export default class Textbook extends MainPage {
         const linkData = document.createElement('a');
         linkData.classList.add('textBook_page_link');
         linkData.setAttribute('href', `#Textbook_${currentPart}_${element[1]}`);
-        thisPart.addEventListener('click', () => {
+        /*         thisPart.addEventListener('click', () => {
           this.store.setCurrentPage('Textbook', currentPart, element[1] as number);
-        });
+        }); */
         linkData.textContent = element[0].toString();
         thisPart.append(linkData);
       } else {
