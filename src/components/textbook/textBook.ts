@@ -2,6 +2,7 @@ import './textbook.scss';
 import Store from '@src/store/store';
 import { TEXTBOOK_PARTS, ALL_PAGES, DATABASE_LINK } from '@common/constants';
 import GetData from '@src/api/getData';
+import { TWordSimple } from '@common/baseTypes';
 import MainPage from '../mainPage';
 
 export default class Textbook extends MainPage {
@@ -52,31 +53,7 @@ export default class Textbook extends MainPage {
 
     await GetData.getData(`words?group=${currentPart}&&page=${currentPage}`, (result) => {
       result.forEach((element) => {
-        const oneWord = document.createElement('div');
-        oneWord.classList.add('textbook-one_word-element');
-        const audioElement = document.createElement('div');
-        audioElement.classList.add('sound-icon');
-        audioElement.addEventListener('click', () => {
-          const audio = new Audio();
-          audio.src = `${DATABASE_LINK}/${element.audio}`;
-          audio.play();
-        });
-        oneWord.append(audioElement);
-        const wordElement = document.createElement('span');
-        wordElement.classList.add('word__text');
-        wordElement.textContent = element.word;
-        oneWord.append(wordElement);
-        const wordTranslate = document.createElement('span');
-        wordTranslate.classList.add('word__translate');
-        wordTranslate.textContent = element.wordTranslate;
-        oneWord.append(wordTranslate);
-        if (this.store.getAuthorized()) {
-          oneWord.classList.add('word-with-action');
-          oneWord.addEventListener('click', () => {
-            this.hardNotHard(element.id);
-          });
-        }
-        wordsContainer.append(oneWord);
+        wordsContainer.append(this.oneWordShow(element));
       });
     });
     sectionWordElement.append(gamesButtonContainer);
@@ -87,6 +64,73 @@ export default class Textbook extends MainPage {
   hardNotHard(id:string) {
     // todo add.or delete word from hard.words
     console.log(id);
+  }
+
+  oneWordShow(word: TWordSimple):HTMLElement {
+    const wordWrapper = document.createElement('div');
+    wordWrapper.classList.add('textbook-one_word-element');
+    const wordImage = document.createElement('div');
+    wordImage.classList.add('word-image');
+    wordImage.style.backgroundImage = `url(${DATABASE_LINK}/${word.image})`;
+    wordWrapper.append(wordImage);
+    const wordInfoWrapper = document.createElement('div');
+    wordInfoWrapper.classList.add('textbook-one_word-info');
+    const oneWord = document.createElement('div');
+    oneWord.classList.add('textbook-one_word-element');
+    const audioElement = document.createElement('div');
+    audioElement.classList.add('sound-icon');
+    audioElement.addEventListener('click', () => {
+      const audio = new Audio();
+      audio.src = `${DATABASE_LINK}/${word.audio}`;
+      audio.play();
+      const audioList = [word.audio, word.audioMeaning, word.audioExample];
+      let currentAudio = 0;
+      audio.addEventListener('ended', () => {
+        currentAudio += 1;
+        if (currentAudio < 3) {
+          audio.src = `${DATABASE_LINK}/${audioList[currentAudio]}`;
+          audio.play();
+        }
+      });
+    });
+    oneWord.append(audioElement);
+    const wordElement = document.createElement('span');
+    wordElement.classList.add('word__text');
+    wordElement.textContent = word.word;
+    oneWord.append(wordElement);
+    const wordTranscription = document.createElement('span');
+    wordTranscription.classList.add('word__transcript');
+    wordTranscription.textContent = word.transcription;
+    oneWord.append(wordTranscription);
+    const wordTranslate = document.createElement('span');
+    wordTranslate.classList.add('word__translate');
+    wordTranslate.textContent = word.wordTranslate;
+    oneWord.append(wordTranslate);
+    wordInfoWrapper.append(oneWord);
+    if (this.store.getAuthorized()) {
+      oneWord.classList.add('word-with-action');
+      oneWord.addEventListener('click', () => {
+        this.hardNotHard(word.id);
+      });
+    }
+    const wordMining = document.createElement('div');
+    wordMining.classList.add('textbook__word-mining');
+    wordMining.innerHTML = word.textMeaning;
+    wordInfoWrapper.append(wordMining);
+    const wordMiningTranslate = document.createElement('div');
+    wordMiningTranslate.classList.add('textbook__word-mining_translate');
+    wordMiningTranslate.innerHTML = word.textMeaningTranslate;
+    wordInfoWrapper.append(wordMiningTranslate);
+    const wordExample = document.createElement('div');
+    wordExample.classList.add('textbook__word-example');
+    wordExample.innerHTML = word.textExample;
+    wordInfoWrapper.append(wordExample);
+    const wordExampleTranslate = document.createElement('div');
+    wordExampleTranslate.classList.add('textbook__word-example_translate');
+    wordExampleTranslate.innerHTML = word.textExampleTranslate;
+    wordInfoWrapper.append(wordExampleTranslate);
+    wordWrapper.append(wordInfoWrapper);
+    return wordWrapper;
   }
 
   setPartsAndPages() {
@@ -170,11 +214,6 @@ export default class Textbook extends MainPage {
       pagesLink.push([(currentPage + 1).toString(), -1]);
       if (currentPage < (ALL_PAGES - 1)) {
         pagesLink.push([(currentPage + 2).toString(), currentPage + 1]);
-        /*
-        if (currentPage < (ALL_PAGES - 3))
-          pagesLink.push(['...', Math.floor(((ALL_PAGES - 3) + currentPage) / 2)]);
-        pagesLink.push(['Следующая', currentPage + 1]);
-        */
       }
     }
     if (currentPage < (ALL_PAGES - 4)) {
