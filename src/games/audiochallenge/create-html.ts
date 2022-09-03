@@ -41,7 +41,7 @@ const questionLayout = `<div class="audio-wrapper" id="play-audio"></div>
    <button class="btn-answer" id="answer4"></button>
    <button class="btn-answer" id="answer5"></button>
 </div>
-<button class="btn-next" id="skip">Пропустить</button>
-<button class="btn-next conceal" id="next">Далее</button>`;
+<button class="btn-next btn-primary btn" id="skip">Пропустить</button>
+<button class="btn-next btn-primary btn conceal" id="next">Далее</button>`;
 
 export { StartPopUpLayout, gameLayout, questionLayout };

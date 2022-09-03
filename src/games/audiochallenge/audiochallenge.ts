@@ -1,10 +1,15 @@
 import './styles.scss';
 import Store from '@src/store/store';
 import { StartPopUpLayout, gameLayout, questionLayout } from './create-html';
-import { DATABASE_LINK, ALL_PAGES, LIVES_GAME } from '../../common/constants';
-import { TWordSimple } from '../../common/baseTypes';
+import {
+  DATABASE_LINK, ALL_PAGES, LIVES_GAME, CORRECT_COUNT, CORRECT_COUNT_HARD,
+} from '../../common/constants';
+import { TWordSimple, TUserWord } from '../../common/baseTypes';
 import Question from './question';
 import AudioChallengeResults from './results';
+import Store from '../../store/store';
+import { getUserWord, createUserWord, updateUserWord } from '../../api/userWords';
+import { updateUserStatistic, getUserStatistic } from '../../api/userStatistic';
 
 async function getWords(level:number, pageNumber?: number) {
   let page:number;
@@ -16,6 +21,11 @@ async function getWords(level:number, pageNumber?: number) {
   const res = await fetch(`${DATABASE_LINK}/words?group=${level}&page=${page}`);
   const wordsArray: Array<TWordSimple> = await res.json();
   return wordsArray;
+}
+
+function isDataToday(date: string) {
+  const dateNow = new Date().toLocaleDateString();
+  return (date === dateNow);
 }
 
 export default class AudioChallenge {
@@ -41,6 +51,11 @@ export default class AudioChallenge {
 
   store: Store;
 
+  newWords: number;
+
+  learnedWords: number;
+
+
   constructor(store:Store) {
     this.group = -1;
     this.page = undefined;
@@ -52,12 +67,17 @@ export default class AudioChallenge {
     this.seriesNow = 0;
     this.seriesResult = 0;
     this.store = store;
+    this.newWords = 0;
+    this.learnedWords = 0;
   }
 
   create():HTMLElement {
     this.element.classList.add('audio-challenge');
     const gameWrapper = '<div class="games-wrapper"></div>';
     this.element.innerHTML = gameWrapper;
+    // скрываем footer
+    const footer = <HTMLElement> document.getElementsByClassName('footer')[0];
+    footer.classList.add('conceal');
     // если пришли с главной страницы
     this.drawLayout(StartPopUpLayout, 'games-wrapper');
     const btnLevels = <HTMLElement> this.element.getElementsByClassName('buttons-levels-wrapper')[0];
@@ -95,9 +115,9 @@ export default class AudioChallenge {
     skipBtn.addEventListener('click', () => { question.showAnswers(); });
     // кнопка далее
     const nextBtn = <HTMLElement> document.getElementById('next');
-    nextBtn.addEventListener('click', () => { this.handleNextBtn(question); });
+    nextBtn.addEventListener('click', async () => { await this.handleNextBtn(question); });
     // клавиатура
-    document.onkeydown = (e) => { this.handleKeyboard(e, question); };
+    document.onkeydown = async (e) => { await this.handleKeyboard(e, question); };
   }
 
   getRandomAnswers(wordsArray:Array<TWordSimple>, word:string):Array<string> {
@@ -110,11 +130,17 @@ export default class AudioChallenge {
     return Array.from(randomAnswers);
   }
 
-  handleNextBtn(question: Question) {
+  async handleNextBtn(question: Question) {
     if (question.isCorrect) {
       this.correctAnswers.push(question.word);
       this.seriesNow += 1;
+      if (this.store.getAuthorized()) {
+        await this.updateCorrectUserWord(question.word);
+      }
     } else {
+      if (this.store.getAuthorized()) {
+        await this.updateIncorrectUserWord(question.word);
+      }
       this.wrongAnswers.push(question.word);
       this.livesInGame -= 1;
       this.getSeriesResult();
@@ -132,6 +158,9 @@ export default class AudioChallenge {
         this.wrongAnswers,
         this.seriesResult,
       );
+      if (this.store.getAuthorized()) {
+        await this.setStatisticGame();
+      }
       result.start();
     }
   }
@@ -147,13 +176,12 @@ export default class AudioChallenge {
     liveItem.classList.add('live-item_over');
   }
 
-  handleKeyboard(e:KeyboardEvent, question: Question) {
+  async handleKeyboard(e:KeyboardEvent, question: Question) {
     if (e.key === ' ') {
       e.preventDefault();
       question.play();
     }
     const answerNumber = Number(e.key);
-    // if ((e.key === '1') || (e.key === '2') || (e.key === '3') || (e.key === '4') || (e.key === '5')) {
     if (answerNumber > 0 && answerNumber < 6) {
       e.preventDefault();
       question.showAnswers();
@@ -167,7 +195,7 @@ export default class AudioChallenge {
       }
     } else if (e.key === 'ArrowRight') {
       e.preventDefault();
-      this.handleNextBtn(question);
+      await this.handleNextBtn(question);
     }
   }
 
@@ -178,6 +206,108 @@ export default class AudioChallenge {
       this.drawLayout(questionLayout, 'game-question');
       this.wordsArray = await getWords(group, this.page);
       this.startGame();
+    }
+  }
+
+  async updateCorrectUserWord(word: TWordSimple) {
+    const user = this.store.getUser();
+    const wordData = await getUserWord(user.id, user.token, word.id);
+    // новое слово
+    if (!wordData) {
+      this.newWords += 1;
+      const userWordData = {
+        difficulty: 'normal',
+        optional: {
+          correctCount: 1,
+          isStudy: false,
+          totalCorrectCount: 1,
+          totalIncorrectCount: 0,
+        },
+      };
+      createUserWord(user.id, user.token, word.id, userWordData);
+    } else {
+      // обновить слово
+      wordData.optional.correctCount += 1;
+      wordData.optional.totalCorrectCount += 1;
+      if (wordData.difficulty === 'normal' && wordData.optional.correctCount >= CORRECT_COUNT) {
+        wordData.optional.isStudy = true;
+        this.learnedWords += 1;
+      }
+      if (wordData.difficulty === 'hard' && wordData.optional.correctCount >= CORRECT_COUNT_HARD) {
+        wordData.optional.isStudy = true;
+        wordData.difficulty = 'normal';
+        this.learnedWords += 1;
+      }
+      updateUserWord(user.id, user.token, word.id, wordData);
+    }
+  }
+
+  async updateIncorrectUserWord(word: TWordSimple) {
+    const user = this.store.getUser();
+    const wordData = await getUserWord(user.id, user.token, word.id);
+    let userWordData: TUserWord;
+    // новое слово
+    if (!wordData) {
+      this.newWords += 1;
+      userWordData = {
+        difficulty: 'normal',
+        optional: {
+          correctCount: 0,
+          isStudy: false,
+          totalCorrectCount: 0,
+          totalIncorrectCount: 1,
+        },
+      };
+      createUserWord(user.id, user.token, word.id, userWordData);
+    } else {
+      // обновить слово
+      wordData.optional.correctCount = 0;
+      wordData.optional.totalIncorrectCount += 1;
+      if (wordData.isStudy) {
+        wordData.isStudy = false;
+        this.learnedWords -= 1;
+      }
+      updateUserWord(user.id, user.token, word.id, wordData);
+    }
+  }
+
+  async setStatisticGame() {
+    const statistic = await getUserStatistic(
+      this.store.getUser().id,
+      this.store.getUser().token,
+    );
+    if ((!statistic) || (!isDataToday(statistic.optional.date))) {
+      const statisticObj = {
+        learnedWords: 0,
+        optional: {
+          date: new Date().toLocaleDateString(),
+          audioChallenge: {
+            correctAnswers: this.correctAnswers.length,
+            wrongAnswers: this.wrongAnswers.length,
+            series: this.seriesResult,
+            newWords: this.newWords,
+          },
+        },
+      };
+      await updateUserStatistic(
+        this.store.getUser().id,
+        this.store.getUser().token,
+        statisticObj,
+      );
+    } else {
+      const { id, ...statisticObj } = statistic;
+      statisticObj.learnedWords += this.learnedWords;
+      statisticObj.optional.audioChallenge.correctAnswers += this.correctAnswers.length;
+      statisticObj.optional.audioChallenge.wrongAnswers += this.wrongAnswers.length;
+      statisticObj.optional.audioChallenge.series = (
+        this.seriesResult > statisticObj.optional.audioChallenge.series
+      ) ? this.seriesResult : statisticObj.optional.audioChallenge.series;
+      statisticObj.optional.audioChallenge.newWords += this.newWords;
+      await updateUserStatistic(
+        this.store.getUser().id,
+        this.store.getUser().token,
+        statisticObj,
+      );
     }
   }
 }
