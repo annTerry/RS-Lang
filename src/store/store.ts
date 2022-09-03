@@ -1,5 +1,6 @@
 import {
   PagesCategory, TStoreBase, TPage, StoreCallbackFunction,
+  TPageAndPart,
 } from '@common/baseTypes';
 
 export default class Store {
@@ -20,6 +21,10 @@ export default class Store {
   getItem(key: string, defaultValue: string): string {
     const value = localStorage.getItem(key);
     return value !== null ? value : defaultValue;
+  }
+
+  getTextBookPage():TPageAndPart {
+    return this.store.textBook || {};
   }
 
   setItem(key: string, value: string): void {
@@ -52,6 +57,10 @@ export default class Store {
     return this.store.currentPage.number || 0;
   }
 
+  getCurrentPartNumber():number {
+    return this.store.currentPage.part || 0;
+  }
+
   getUser() {
     return {
       id: this.store.uid,
@@ -70,26 +79,35 @@ export default class Store {
         this.store.uid = '';
         delete this.store.username;
         delete this.store.token;
-        this.setItem('uid', '')
+        this.setItem('uid', '');
         this.removeItem('username');
         this.removeItem('token');
       } else {
         this.store.uid = uid;
         this.store.username = username;
         this.store.token = token;
-        this.setItem('uid', uid)
+        this.setItem('uid', uid);
         this.setItem('username', username);
         this.setItem('token', token);
       }
     } catch (e) {
       console.error('Wrong Authorization params');
     }
+    this.resolveWatchers('Authorize');
   }
 
-  setCurrentPage(page:string, number?:number) {
+  setCurrentTextBook(part = 0, number = 0) {
+    if (this.store.textBook === undefined) { this.store.textBook = {}; }
+    this.store.textBook.number = number;
+    this.store.textBook.part = part;
+    this.resolveWatchers('TextBook');
+  }
+
+  setCurrentPage(page:string, part?:number, number?:number) {
     const newPage:PagesCategory = PagesCategory[page as keyof typeof PagesCategory];
     this.store.currentPage.page = newPage;
     if (number !== undefined) this.store.currentPage.number = number;
+    if (part !== undefined) this.store.currentPage.part = part;
     this.resolveWatchers('currentPage');
   }
 }

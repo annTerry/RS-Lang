@@ -1,16 +1,21 @@
 import './auth.scss';
-import { formsHtml, linksHtml } from './html';
 import Modal from '@components/modal/modal';
 import { DATABASE_LINK } from '@common/constants';
-import Store from '../../store/store';
 import { TAlertType, TErrorMessage } from '@common/baseTypes';
+import Store from '../../store/store';
+import { formsHtml, linksHtml } from './html';
 
 export default class Auth {
   modal: Modal | null;
+
   formLogin: HTMLElement | null;
+
   formRegister: HTMLElement | null;
+
   alertForm: HTMLElement | null;
+
   authLinks: HTMLElement | null;
+
   store: Store;
 
   constructor(store: Store) {
@@ -24,8 +29,9 @@ export default class Auth {
       'Авторизация',
       formsHtml,
       {
-        css: 'modal_auth'
-      })
+        css: 'modal_auth',
+      },
+    );
     this.createLinks();
     this.addEvents();
     this.switchAuth();
@@ -75,7 +81,7 @@ export default class Auth {
   // Подготовка текста для сообщения
   alertPrepare(text: TErrorMessage[] | string = ''): string {
     if (Array.isArray(text) && text.length) {
-      const items = text.map(item => item.message);
+      const items = text.map((item) => item.message);
       return (items.length > 1)
         ? `<ul><li>${items.join('</li><li>')}</li></ul>`
         : items.join('');
@@ -90,8 +96,7 @@ export default class Auth {
     if (message) {
       this.alertForm.classList.remove('hide');
       this.alertForm.innerHTML = `<div class="alert alert_${type}">${message}</div>`;
-    }
-    else {
+    } else {
       this.alertForm.classList.add('hide');
       this.alertForm.innerHTML = '';
     }
@@ -125,8 +130,7 @@ export default class Auth {
       linkOpen.classList.add('hide');
       linkLogout.classList.remove('hide');
       username.classList.remove('hide');
-    }
-    else {
+    } else {
       linkOpen.classList.remove('hide');
       username.classList.add('hide');
       linkLogout.classList.add('hide');
@@ -138,16 +142,16 @@ export default class Auth {
 
   register() {
     if (!(this.formRegister instanceof HTMLFormElement)) return;
-    let formData = Object.fromEntries(new FormData(this.formRegister).entries());
+    const formData = Object.fromEntries(new FormData(this.formRegister).entries());
     fetch(`${DATABASE_LINK}/users`, {
       method: 'POST',
       headers: {
-        'Content-Type': 'application/json;charset=utf-8'
+        'Content-Type': 'application/json;charset=utf-8',
       },
-      body: JSON.stringify(formData)
+      body: JSON.stringify(formData),
     })
-      .then(response => response.text())
-      .then(text => {
+      .then((response) => response.text())
+      .then((text) => {
         try {
           console.log('txt', text);
           const data = JSON.parse(text);
@@ -159,7 +163,7 @@ export default class Auth {
             this.switchForm('login');
             this.alert('Вы успешно зарегистрировались. Пожалуйста, авторизуйтесь.', 'success');
           }
-        } catch(err) {
+        } catch (err) {
           this.alert(text, 'danger');
         }
       });
@@ -167,16 +171,16 @@ export default class Auth {
 
   login() {
     if (!(this.formLogin instanceof HTMLFormElement)) return;
-    let formData = Object.fromEntries(new FormData(this.formLogin).entries());
+    const formData = Object.fromEntries(new FormData(this.formLogin).entries());
     fetch(`${DATABASE_LINK}/signin`, {
       method: 'POST',
       headers: {
-        'Content-Type': 'application/json;charset=utf-8'
+        'Content-Type': 'application/json;charset=utf-8',
       },
-      body: JSON.stringify(formData)
+      body: JSON.stringify(formData),
     })
-      .then(response => response.text())
-      .then(text => {
+      .then((response) => response.text())
+      .then((text) => {
         try {
           const data = JSON.parse(text);
           const { userId, name, token } = data;
@@ -184,7 +188,7 @@ export default class Auth {
           this.switchAuth();
           (this.formLogin as HTMLFormElement).reset();
           this.modal?.close();
-        } catch(err) {
+        } catch (err) {
           this.alert(text, 'danger');
         }
       });
@@ -194,5 +198,4 @@ export default class Auth {
     this.store.setAuthorized('', '');
     this.switchAuth();
   }
-
 }

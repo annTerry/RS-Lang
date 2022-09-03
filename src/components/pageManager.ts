@@ -1,14 +1,16 @@
-import Router from 'src/api/router';
+import Router from '../api/router';
 import AudioChallenge from '../games/audiochallenge/audiochallenge';
 import Store from '../store/store';
 import MainPage from './mainPage';
+import Textbook from './textbook/textBook';
 
 const PAGES_TYPES = {
   Main: MainPage,
   AudioChallenge,
+  Textbook,
 };
 
-type TPageClass = { [key:string]: AudioChallenge | MainPage } | undefined;
+type TPageClass = { [key:string]: AudioChallenge | MainPage | Textbook } | undefined;
 
 export default class PageManager {
   store:Store;
@@ -23,15 +25,19 @@ export default class PageManager {
     this.store = store;
     this.router = router;
     this.pageClass = this.setPages();
-    this.mainElement = document.getElementsByTagName('main')[0] as HTMLElement;
-    this.mainElement.innerHTML = '';
+    this.mainElement = document.createElement('main');
+    document.body.append(this.mainElement);
     store.addWatcher('currentPage', () => { this.resetPage(); });
+    window.addEventListener('hashchange', () => {
+      this.router.setNewPage();
+    });
     this.resetPage();
   }
 
   resetPage() {
     const currentPage = this.store.getCurrentPageName();
     const currentClass = this.pageClass && this.pageClass[currentPage];
+    this.mainElement.innerHTML = '';
     if (currentClass) {
       this.mainElement.append(currentClass.create());
     } else {
@@ -42,7 +48,8 @@ export default class PageManager {
   setPages():TPageClass {
     const pageObj:TPageClass = {};
     Object.entries(PAGES_TYPES).forEach((entry) => {
-      pageObj[entry[0] as string] = new entry[1]();
+      const currentType = entry[0] as string;
+      pageObj[currentType] = new entry[1](this.store);
     });
     return pageObj;
   }

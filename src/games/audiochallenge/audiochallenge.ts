@@ -1,4 +1,5 @@
 import './styles.scss';
+import Store from '@src/store/store';
 import { StartPopUpLayout, gameLayout, questionLayout } from './create-html';
 import {
   DATABASE_LINK, ALL_PAGES, LIVES_GAME, CORRECT_COUNT, CORRECT_COUNT_HARD,
@@ -54,7 +55,8 @@ export default class AudioChallenge {
 
   learnedWords: number;
 
-  constructor() {
+
+  constructor(store:Store) {
     this.group = -1;
     this.page = undefined;
     this.questionNum = 0;
@@ -64,7 +66,7 @@ export default class AudioChallenge {
     this.livesInGame = LIVES_GAME;
     this.seriesNow = 0;
     this.seriesResult = 0;
-    this.store = new Store();
+    this.store = store;
     this.newWords = 0;
     this.learnedWords = 0;
   }

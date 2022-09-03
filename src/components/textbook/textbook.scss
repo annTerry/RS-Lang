@@ -1,0 +1,65 @@
+.part-container {
+  display: flex;
+  justify-content: space-evenly;
+  margin: 20px 0;
+  padding: 0;
+}
+.textBook-part-name {
+  list-style-type: none;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  &:not(.Active) {
+    cursor: pointer;
+    a {
+      font-weight: bold;
+    }
+  }
+}
+.textBook_part_link
+{
+  text-decoration: none;
+  font-size: 1.4em;
+}
+
+.pages-container {
+  display: flex;
+  justify-content: space-evenly;
+  margin: 20px 0;
+  padding: 0;
+  .textBook-page-link {
+    font-size: 1.1em;
+    list-style-type: none;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  }
+}
+
+.sound-icon{
+  width: 25px;
+  height: 20px;
+  background-image:url('../../assets/svg/sound-small1.svg');
+  background-repeat: no-repeat;
+  background-size: contain;
+  background-position: center;
+  cursor: pointer;
+}
+
+.textbook-one_word-element{
+  display: flex;
+  align-items: center;
+  gap:10px;
+  margin-top: 5px;
+}
+
+.word__text{
+  font-weight: bold;
+}
+.word-image {
+  width: 200px;
+  background-size: 200px 100px;
+  background-position: 0 0;
+  background-repeat: no-repeat;
+  height: 100px;
+}

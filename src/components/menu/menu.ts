@@ -1,4 +1,5 @@
 import Store from 'src/store/store';
+import Router from '@src/api/router';
 import './menu.scss';
 
 type MenuItem = {
@@ -9,14 +10,17 @@ type MenuItem = {
 export default class Menu {
   store:Store;
 
-  constructor(store: Store) {
+  router:Router;
+
+  constructor(store: Store, router: Router) {
     this.store = store;
+    this.router = router;
     this.create();
   }
 
   // Список пунктов меню
   items: Array<MenuItem> = [
-    { name: 'Учебник', link: '' },
+    { name: 'Учебник', link: '#Textbook' },
     { name: 'Аудиочелендж', link: '#AudioChallenge' },
     { name: 'Спринт', link: '' },
     { name: 'Статистика', link: '' },
@@ -32,14 +36,13 @@ export default class Menu {
         ${this.renderLinks()}
       </ul>
     `);
-    const links = document.getElementsByTagName('a');
+    /*  const links = document.getElementsByTagName('a');
     for (let j = 0; j < links.length; j += 1) {
       links[j].addEventListener('click', () => {
-        let clearLink = links[j].getAttribute('href') || '';
-        clearLink = clearLink.replace('#', '');
-        this.store.setCurrentPage(clearLink);
+        const linkHref = links[j].getAttribute('href') as string;
+        this.router.setNewPage(Router.newPageName(linkHref));
       });
-    }
+    } */
   }
 
   /**
