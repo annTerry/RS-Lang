@@ -17,6 +17,9 @@ export default class Textbook extends MainPage {
     this.store.addWatcher('currentPage', () => {
       this.redrawNavigation();
     });
+    this.store.addWatcher('Authorize', () => {
+      this.redrawNavigation();
+    });
   }
 
   redrawNavigation() {
@@ -32,6 +35,21 @@ export default class Textbook extends MainPage {
     const sectionWordElement = document.createElement('section');
     sectionWordElement.classList.add('textbook-words-page');
     sectionWordElement.classList.add(`textbook-part_${currentPart}`);
+    const wordsContainer = document.createElement('div');
+    wordsContainer.classList.add('textbook-word-wrapper');
+    const gamesButtonContainer = document.createElement('div');
+    gamesButtonContainer.classList.add('games-button-wrapper');
+    const sprintButton = document.createElement('a');
+    sprintButton.classList.add('one-game-button');
+    sprintButton.textContent = 'Спринт';
+    sprintButton.href = `#Sprint_${currentPart}_${currentPage}`;
+    const audionChallengeButton = document.createElement('a');
+    audionChallengeButton.classList.add('one-game-button');
+    audionChallengeButton.textContent = 'Аудиочелендж';
+    audionChallengeButton.href = `#AudioChallenge_${currentPart}_${currentPage}`;
+    gamesButtonContainer.append(sprintButton);
+    gamesButtonContainer.append(audionChallengeButton);
+
     await GetData.getData(`words?group=${currentPart}&&page=${currentPage}`, (result) => {
       result.forEach((element) => {
         const oneWord = document.createElement('div');
@@ -58,9 +76,11 @@ export default class Textbook extends MainPage {
             this.hardNotHard(element.id);
           });
         }
-        sectionWordElement.append(oneWord);
+        wordsContainer.append(oneWord);
       });
     });
+    sectionWordElement.append(gamesButtonContainer);
+    sectionWordElement.append(wordsContainer);
     return sectionWordElement;
   }
 
@@ -139,22 +159,34 @@ export default class Textbook extends MainPage {
       else pagesLink.push([(i + 1).toString(), i]);
     }
 
-    if (currentPage === 2) pagesLink.push(['2', -1]);
-    else if (currentPage === 3) pagesLink.push(['3', 2]);
+    if (currentPage === 2) {
+      pagesLink.push(['3', -1]);
+      pagesLink.push(['4', 3]);
+    } else if (currentPage === 1) pagesLink.push(['3', 2]);
     else if (currentPage > 3) pagesLink.push(['...', Math.floor((2 + currentPage) / 2)]);
 
-    if (currentPage > 3 && currentPage <= ALL_PAGES) {
+    if (currentPage > 2 && currentPage <= ALL_PAGES) {
       pagesLink.push([currentPage.toString(), currentPage - 1]);
       pagesLink.push([(currentPage + 1).toString(), -1]);
-      if (currentPage < (ALL_PAGES - 3)) pagesLink.push(['...', Math.floor(((ALL_PAGES - 3) + currentPage) / 2)]);
       if (currentPage < (ALL_PAGES - 1)) {
         pagesLink.push([(currentPage + 2).toString(), currentPage + 1]);
+        /*
+        if (currentPage < (ALL_PAGES - 3))
+          pagesLink.push(['...', Math.floor(((ALL_PAGES - 3) + currentPage) / 2)]);
         pagesLink.push(['Следующая', currentPage + 1]);
+        */
       }
-    } else {
-      pagesLink.push(['...', Math.floor(ALL_PAGES / 2)]);
+    }
+    if (currentPage < (ALL_PAGES - 4)) {
+      pagesLink.push(['...', currentPage + Math.floor((ALL_PAGES - currentPage) / 2)]);
+    }
+    if (currentPage < (ALL_PAGES - 3)) {
       pagesLink.push([(ALL_PAGES - 1).toString(), ALL_PAGES - 2]);
+    }
+    if (currentPage < (ALL_PAGES - 2)) {
       pagesLink.push([ALL_PAGES.toString(), ALL_PAGES - 1]);
+    }
+    if (currentPage < (ALL_PAGES - 1)) {
       pagesLink.push(['Следующая', currentPage + 1]);
     }
     return pagesLink;
