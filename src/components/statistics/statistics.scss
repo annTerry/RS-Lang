@@ -21,4 +21,17 @@
 .sub-title{
   font-size: 1rem;
   color:#808080;
+  margin-bottom: 10px;
+}
+.statistics-item{
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 10px;
+}
+.statistics-card{
+  width: 100%;
+  padding: 15px;
+  background-color: rgba(127, 255, 212, 0.4);
+  border-radius: 15px;
+  margin-bottom: 24px;
 }
