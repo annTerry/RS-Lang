@@ -23,7 +23,7 @@ export default class Menu {
     { name: 'Учебник', link: '#Textbook' },
     { name: 'Аудиочелендж', link: '#AudioChallenge' },
     { name: 'Спринт', link: '' },
-    { name: 'Статистика', link: '' },
+    { name: 'Статистика', link: '#Statistics' },
   ];
 
   /**
