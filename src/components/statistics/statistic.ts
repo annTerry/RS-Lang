@@ -112,6 +112,7 @@ export default class Statistics {
   }
 
   сalculatePercentage(correct:number, inCorrect: number) {
-    return Math.round((correct / (correct + inCorrect)) * 100);
+    const result = Math.round((correct / (correct + inCorrect)) * 100);
+    return (!result) ? 0 : result;
   }
 }
