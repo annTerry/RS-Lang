@@ -11,11 +11,7 @@ import {
   getUserWord, createUserWord, updateUserWord, getUserWords, getWords,
 } from '../../api/userWords';
 import { updateUserStatistic, getUserStatistic } from '../../api/userStatistic';
-
-function isDataToday(date: string) {
-  const dateNow = new Date().toLocaleDateString();
-  return (date === dateNow);
-}
+import isDataToday from '../../helpers';
 
 export default class AudioChallenge {
   group: number | undefined;
@@ -66,6 +62,7 @@ export default class AudioChallenge {
     // скрываем footer
     const footer = <HTMLElement> document.getElementsByClassName('footer')[0];
     if (footer) footer.classList.add('conceal');
+
     this.group = this.store.getCurrentPartNumber();
     this.page = this.store.getCurrentPageNumber();
     console.log(this.group, this.page);
