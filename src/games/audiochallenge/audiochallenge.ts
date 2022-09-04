@@ -7,7 +7,6 @@ import {
 import { TWordSimple, TUserWord } from '../../common/baseTypes';
 import Question from './question';
 import AudioChallengeResults from './results';
-import Store from '../../store/store';
 import { getUserWord, createUserWord, updateUserWord } from '../../api/userWords';
 import { updateUserStatistic, getUserStatistic } from '../../api/userStatistic';
 
@@ -54,7 +53,6 @@ export default class AudioChallenge {
   newWords: number;
 
   learnedWords: number;
-
 
   constructor(store:Store) {
     this.group = -1;

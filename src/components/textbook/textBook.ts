@@ -61,9 +61,10 @@ export default class Textbook extends MainPage {
     return sectionWordElement;
   }
 
-  hardNotHard(id:string) {
+  changeStatForWord(id:string, stat:string) {
     // todo add.or delete word from hard.words
     console.log(id);
+    console.log(stat);
   }
 
   oneWordShow(word: TWordSimple):HTMLElement {
@@ -107,12 +108,6 @@ export default class Textbook extends MainPage {
     wordTranslate.textContent = word.wordTranslate;
     oneWord.append(wordTranslate);
     wordInfoWrapper.append(oneWord);
-    if (this.store.getAuthorized()) {
-      oneWord.classList.add('word-with-action');
-      oneWord.addEventListener('click', () => {
-        this.hardNotHard(word.id);
-      });
-    }
     const wordMining = document.createElement('div');
     wordMining.classList.add('textbook__word-mining');
     wordMining.innerHTML = word.textMeaning;
@@ -130,6 +125,25 @@ export default class Textbook extends MainPage {
     wordExampleTranslate.innerHTML = word.textExampleTranslate;
     wordInfoWrapper.append(wordExampleTranslate);
     wordWrapper.append(wordInfoWrapper);
+    if (this.store.getAuthorized()) {
+      const wordActionsWrapper = document.createElement('div');
+      wordActionsWrapper.classList.add('actions-buttons');
+      const easyButton = document.createElement('div');
+      easyButton.classList.add('word_easy-word');
+      easyButton.textContent = 'Знаю!';
+      easyButton.addEventListener('click', () => {
+        this.changeStatForWord(word.id, 'easy');
+      });
+      const hardButton = document.createElement('div');
+      hardButton.classList.add('word_hard-word');
+      hardButton.textContent = 'Сложно!';
+      hardButton.addEventListener('click', () => {
+        this.changeStatForWord(word.id, 'hard');
+      });
+      wordActionsWrapper.append(easyButton);
+      wordActionsWrapper.append(hardButton);
+      wordWrapper.append(wordActionsWrapper);
+    }
     return wordWrapper;
   }
 
@@ -142,7 +156,9 @@ export default class Textbook extends MainPage {
       this.wordsSection = element;
       this.element.append(this.parts);
       this.element.append(this.wordsSection);
-      this.element.append(this.pages);
+      if (currentPart !== 6) {
+        this.element.append(this.pages);
+      }
     });
   }
 
@@ -171,7 +187,7 @@ export default class Textbook extends MainPage {
 
   drawPages(currentPart = 0, currentPage = 0):HTMLElement {
     const pageElement = document.createElement('section');
-    pageElement.classList.add('pagess-wrapper');
+    pageElement.classList.add('pages-wrapper');
     const pageBaseElement = document.createElement('ul');
     pageBaseElement.classList.add('pages-container');
     const pagesLink = this.dataForPagesRender(currentPage);

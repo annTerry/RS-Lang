@@ -57,7 +57,7 @@ type TStoreBase = {
   username?: string,
   token?: string,
   currentPage: TPage,
-  words?: TWordObject,
+  words?: { [id:string]: TWordStat },
   textBook?: TPageAndPart,
 };
 
@@ -93,10 +93,10 @@ type TUserStatistic = {
     }
   }
 };
-
+type GetWordsStatFunction = (data:Array<TUserWord>) => void;
 export {
   TWordSimple, TUser, GetWordsFunction, PostUserFunction,
   TStoreBase, TPage, PagesCategory, TWordStat, TWordObject,
-  TAlertType, TErrorMessage,
+  TAlertType, TErrorMessage, GetWordsStatFunction,
   StoreCallbackFunction, TPageAndPart, TUserWord, TUserStatistic,
 };

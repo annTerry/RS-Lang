@@ -63,3 +63,19 @@
   background-repeat: no-repeat;
   height: 100px;
 }
+.actions-buttons
+{
+  display: flex;
+  flex-direction: column;
+}
+
+.word_easy-word
+{
+ height:20px;
+ width:200px; 
+}
+.word_hard-word
+{
+ height:20px;
+ width:200px; 
+}

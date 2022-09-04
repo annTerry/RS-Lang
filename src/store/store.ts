@@ -73,6 +73,17 @@ export default class Store {
     return !!this.store.uid;
   }
 
+  async setWords(resolve = 'simple') {
+    if (this.store.uid !== '') {
+      this.store.words = {};
+    } else {
+      this.store.words = {};
+    }
+    if (resolve === 'authorize') {
+      this.resolveWatchers('Authorize');
+    }
+  }
+
   setAuthorized(uid: string, username: string, token?: string) {
     try {
       if (typeof token !== 'string' || !token || !uid) {
@@ -90,10 +101,10 @@ export default class Store {
         this.setItem('username', username);
         this.setItem('token', token);
       }
+      this.setWords('authorize');
     } catch (e) {
       console.error('Wrong Authorization params');
     }
-    this.resolveWatchers('Authorize');
   }
 
   setCurrentTextBook(part = 0, number = 0) {
