@@ -2,26 +2,15 @@ import './styles.scss';
 import Store from '@src/store/store';
 import { StartPopUpLayout, gameLayout, questionLayout } from './create-html';
 import {
-  DATABASE_LINK, ALL_PAGES, LIVES_GAME, CORRECT_COUNT, CORRECT_COUNT_HARD,
+  LIVES_GAME, CORRECT_COUNT, CORRECT_COUNT_HARD,
 } from '../../common/constants';
 import { TWordSimple, TUserWord } from '../../common/baseTypes';
 import Question from './question';
 import AudioChallengeResults from './results';
-import Store from '../../store/store';
-import { getUserWord, createUserWord, updateUserWord } from '../../api/userWords';
+import {
+  getUserWord, createUserWord, updateUserWord, getUserWords, getWords,
+} from '../../api/userWords';
 import { updateUserStatistic, getUserStatistic } from '../../api/userStatistic';
-
-async function getWords(level:number, pageNumber?: number) {
-  let page:number;
-  if (!pageNumber) {
-    page = Math.floor(Math.random() * ALL_PAGES);
-  } else {
-    page = pageNumber;
-  }
-  const res = await fetch(`${DATABASE_LINK}/words?group=${level}&page=${page}`);
-  const wordsArray: Array<TWordSimple> = await res.json();
-  return wordsArray;
-}
 
 function isDataToday(date: string) {
   const dateNow = new Date().toLocaleDateString();
@@ -29,7 +18,7 @@ function isDataToday(date: string) {
 }
 
 export default class AudioChallenge {
-  group:number;
+  group: number | undefined;
 
   element = document.createElement('section');
 
@@ -55,10 +44,10 @@ export default class AudioChallenge {
 
   learnedWords: number;
 
-
   constructor(store:Store) {
-    this.group = -1;
-    this.page = undefined;
+    this.store = store;
+    this.group = 0;
+    this.page = 0;
     this.questionNum = 0;
     this.wordsArray = [];
     this.correctAnswers = [];
@@ -66,7 +55,6 @@ export default class AudioChallenge {
     this.livesInGame = LIVES_GAME;
     this.seriesNow = 0;
     this.seriesResult = 0;
-    this.store = store;
     this.newWords = 0;
     this.learnedWords = 0;
   }
@@ -77,14 +65,37 @@ export default class AudioChallenge {
     this.element.innerHTML = gameWrapper;
     // скрываем footer
     const footer = <HTMLElement> document.getElementsByClassName('footer')[0];
-    footer.classList.add('conceal');
+    if (footer) footer.classList.add('conceal');
+    this.group = this.store.getCurrentPartNumber();
+    this.page = this.store.getCurrentPageNumber();
+    console.log(this.group, this.page);
     // если пришли с главной страницы
-    this.drawLayout(StartPopUpLayout, 'games-wrapper');
-    const btnLevels = <HTMLElement> this.element.getElementsByClassName('buttons-levels-wrapper')[0];
-    btnLevels.addEventListener('click', (e: Event) => { this.handleLevelBtn(e); });
-    // выбор уровня с клавиатуры
-    document.onkeydown = (e) => { this.handleLevelKeyboard(e); };
+    if (this.group === undefined
+      || this.page === undefined) {
+      this.drawLayout(StartPopUpLayout, 'games-wrapper');
+      const btnLevels = <HTMLElement> this.element.getElementsByClassName('buttons-levels-wrapper')[0];
+      btnLevels.addEventListener('click', (e: Event) => { this.handleLevelBtn(e); });
+      // выбор уровня с клавиатуры
+      document.onkeydown = (e) => { this.handleLevelKeyboard(e); };
+    } else {
+      this.startGameInTextBook();
+    }
+
     return this.element;
+  }
+
+  async startGameInTextBook() {
+    this.drawLayout(gameLayout, 'games-wrapper');
+    this.drawLayout(questionLayout, 'game-question');
+    if (this.store.getAuthorized()) {
+      const user = this.store.getUser();
+      if (this.group && this.page) {
+        this.wordsArray = await getUserWords(this.group, this.page, user.id, user.token);
+      // console.log(this.wordsArray);
+      }
+    } else if (this.group) this.wordsArray = await getWords(this.group, this.page);
+
+    this.startGame();
   }
 
   drawLayout(HTMLLayout: string, wrapperClass:string) {
@@ -211,7 +222,10 @@ export default class AudioChallenge {
 
   async updateCorrectUserWord(word: TWordSimple) {
     const user = this.store.getUser();
-    const wordData = await getUserWord(user.id, user.token, word.id);
+    /* eslint no-underscore-dangle: 0 */
+    const wordId = word.id ? word.id : word._id;
+    let wordData;
+    if (wordId) wordData = await getUserWord(user.id, user.token, wordId);
     // новое слово
     if (!wordData) {
       this.newWords += 1;
@@ -224,7 +238,7 @@ export default class AudioChallenge {
           totalIncorrectCount: 0,
         },
       };
-      createUserWord(user.id, user.token, word.id, userWordData);
+      if (wordId) createUserWord(user.id, user.token, wordId, userWordData);
     } else {
       // обновить слово
       wordData.optional.correctCount += 1;
@@ -238,13 +252,15 @@ export default class AudioChallenge {
         wordData.difficulty = 'normal';
         this.learnedWords += 1;
       }
-      updateUserWord(user.id, user.token, word.id, wordData);
+      if (wordId) updateUserWord(user.id, user.token, wordId, wordData);
     }
   }
 
   async updateIncorrectUserWord(word: TWordSimple) {
     const user = this.store.getUser();
-    const wordData = await getUserWord(user.id, user.token, word.id);
+    const wordId = word.id ? word.id : word._id;
+    let wordData;
+    if (wordId) wordData = await getUserWord(user.id, user.token, wordId);
     let userWordData: TUserWord;
     // новое слово
     if (!wordData) {
@@ -258,7 +274,7 @@ export default class AudioChallenge {
           totalIncorrectCount: 1,
         },
       };
-      createUserWord(user.id, user.token, word.id, userWordData);
+      if (wordId) createUserWord(user.id, user.token, wordId, userWordData);
     } else {
       // обновить слово
       wordData.optional.correctCount = 0;
@@ -267,7 +283,7 @@ export default class AudioChallenge {
         wordData.isStudy = false;
         this.learnedWords -= 1;
       }
-      updateUserWord(user.id, user.token, word.id, wordData);
+      if (wordId) updateUserWord(user.id, user.token, wordId, wordData);
     }
   }
 
