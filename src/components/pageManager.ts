@@ -3,14 +3,16 @@ import AudioChallenge from '../games/audiochallenge/audiochallenge';
 import Store from '../store/store';
 import MainPage from './mainPage';
 import Textbook from './textbook/textBook';
+import Statistics from './statistics/statistic';
 
 const PAGES_TYPES = {
   Main: MainPage,
   AudioChallenge,
   Textbook,
+  Statistics,
 };
 
-type TPageClass = { [key:string]: AudioChallenge | MainPage | Textbook } | undefined;
+type TPageClass = { [key:string]: AudioChallenge | MainPage | Textbook | Statistics } | undefined;
 
 export default class PageManager {
   store:Store;
