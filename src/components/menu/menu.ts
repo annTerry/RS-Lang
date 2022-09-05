@@ -22,7 +22,7 @@ export default class Menu {
   items: Array<MenuItem> = [
     { name: 'Учебник', link: '#Textbook' },
     { name: 'Аудиочелендж', link: '#AudioChallenge' },
-    { name: 'Спринт', link: '' },
+    { name: 'Спринт', link: '#SprintChallenge' },
     { name: 'Статистика', link: '#Statistics' },
   ];
 
