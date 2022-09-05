@@ -1,17 +1,17 @@
 import './styles.scss';
 import Store from '@src/store/store';
-import { StartPopUpLayout, gameLayout, questionLayout } from './html';
 import {
   LIVES_GAME, CORRECT_COUNT, CORRECT_COUNT_HARD,
 } from '@common/constants';
 import { TWordSimple, TUserWord } from '@common/baseTypes';
-import Question from './question';
-import AudioChallengeResults from './results';
 import {
   getUserWord, createUserWord, updateUserWord, getUserWords, getWords,
 } from '@src/api/userWords';
 import { updateUserStatistic, getUserStatistic } from '@src/api/userStatistic';
 import isDataToday from '@src/helpers';
+import AudioChallengeResults from '../audiochallenge/results';
+import Question from '../audiochallenge/question';
+import { StartPopUpLayout, gameLayout, questionLayout } from './html';
 
 export default class SprintChallenge {
   group: number | undefined;

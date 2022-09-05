@@ -11,7 +11,7 @@ export default class Textbook extends MainPage {
 
   wordsSection!: HTMLElement;
 
-  pages!:HTMLElement;
+  pages:HTMLElement | undefined;
 
   constructor(store:Store) {
     super(store, 'Textbook');
@@ -234,16 +234,18 @@ export default class Textbook extends MainPage {
   }
 
   setPartsAndPages() {
-    const currentPart = this.store.getCurrentPartNumber();
-    const currentPage = this.store.getCurrentPageNumber();
+    const currentPart = this.store.getCurrentPartNumber() || 0;
+    const currentPage = this.store.getCurrentPageNumber() || 0;
     this.parts = this.drawParts(currentPart);
-    this.pages = this.drawPages(currentPart, currentPage);
     this.rendWords(currentPart, currentPage).then((element) => {
       this.wordsSection = element;
       this.element.append(this.parts);
       this.element.append(this.wordsSection);
-      if (currentPart !== 6) {
+      if (currentPart !== TEXTBOOK_PARTS) {
+        this.pages = this.drawPages(currentPart, currentPage);
         this.element.append(this.pages);
+      } else {
+        this.pages = undefined;
       }
     });
   }

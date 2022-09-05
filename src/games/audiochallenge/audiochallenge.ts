@@ -8,7 +8,7 @@ import { TWordSimple, TUserWord } from '../../common/baseTypes';
 import Question from './question';
 import AudioChallengeResults from './results';
 import {
-  getUserWord, createUserWord, updateUserWord, getUserWords, getWords,
+  getUserWord, createUserWord, updateUserWord, getUserWords, getUserHardWords, getWords,
 } from '../../api/userWords';
 import { updateUserStatistic, getUserStatistic } from '../../api/userStatistic';
 import isDataToday from '../../helpers';
@@ -68,7 +68,8 @@ export default class AudioChallenge {
     console.log(this.group, this.page);
     // если пришли с главной страницы
     if (this.group === undefined
-      || this.page === undefined) {
+      || (this.group < 6 && this.page === undefined)
+      || (this.group === 6 && !this.store.getAuthorized())) {
       this.drawLayout(StartPopUpLayout, 'games-wrapper');
       const btnLevels = <HTMLElement> this.element.getElementsByClassName('buttons-levels-wrapper')[0];
       btnLevels.addEventListener('click', (e: Event) => { this.handleLevelBtn(e); });
@@ -86,12 +87,15 @@ export default class AudioChallenge {
     this.drawLayout(questionLayout, 'game-question');
     if (this.store.getAuthorized()) {
       const user = this.store.getUser();
-      if (this.group && this.page) {
+      if (this.group === 6) {
+        this.wordsArray = await getUserHardWords(user.id, user.token);
+      } else if (this.group && this.page) {
         this.wordsArray = await getUserWords(this.group, this.page, user.id, user.token);
       // console.log(this.wordsArray);
       }
-    } else if (this.group) this.wordsArray = await getWords(this.group, this.page);
-
+    } else if (this.group && this.group < 6) {
+      this.wordsArray = await getWords(this.group, this.page);
+    }
     this.startGame();
   }
 
