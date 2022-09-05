@@ -30,10 +30,6 @@ export default class AudioChallengeResults {
         <ul class="results-list">${this.generateWordsList(this.wrong)}</ul>
       </div>
     </div>
-    <div class="game-links-contener">
-      <a class="game-link" href="#">К учебнику</a>
-      <a class="game-link" href="#">К играм</a>
-    </div>
     </div>
     `;
   }

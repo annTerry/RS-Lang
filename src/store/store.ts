@@ -53,12 +53,12 @@ export default class Store {
     return this.store.currentPage.page;
   }
 
-  getCurrentPageNumber():number {
-    return this.store.currentPage.number || 0;
+  getCurrentPageNumber():number | undefined {
+    return this.store.currentPage.number || undefined;
   }
 
-  getCurrentPartNumber():number {
-    return this.store.currentPage.part || 0;
+  getCurrentPartNumber():number | undefined {
+    return this.store.currentPage.part || undefined;
   }
 
   getUser() {
