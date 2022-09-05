@@ -2,7 +2,8 @@ import './textbook.scss';
 import Store from '@src/store/store';
 import { TEXTBOOK_PARTS, ALL_PAGES, DATABASE_LINK } from '@common/constants';
 import GetData from '@src/api/getData';
-import { TWordSimple } from '@common/baseTypes';
+import { TStat, TUserWord, TWordSimple } from '@common/baseTypes';
+import PostData from '@src/api/postData';
 import MainPage from '../mainPage';
 
 export default class Textbook extends MainPage {
@@ -48,26 +49,91 @@ export default class Textbook extends MainPage {
     audionChallengeButton.classList.add('one-game-button');
     audionChallengeButton.textContent = 'Аудиочелендж';
     audionChallengeButton.href = `#AudioChallenge_${currentPart}_${currentPage}`;
+
+    const dataStat:TStat = {};
+    if (this.store.getAuthorized()) {
+      const user = this.store.getUser();
+      await GetData.getUserWordsDataAggregated(
+        user.id,
+        user.token,
+        (result) => {
+          result.forEach((userWord) => {
+            if (userWord.wordId) {
+              dataStat[userWord.wordId] = userWord;
+            }
+          });
+        },
+      );
+    }
+    if (currentPart < TEXTBOOK_PARTS) {
+      await GetData.getData(`words?group=${currentPart}&&page=${currentPage}`, (result) => {
+        result.forEach((element) => {
+          wordsContainer.append(this.oneWordShow(element, dataStat));
+        });
+      });
+    } else {
+      const user = this.store.getUser();
+      if (user.id && user.token) {
+        await GetData.getDataHard(
+          user.id,
+          user.token,
+          (result) => {
+            result.forEach((element) => {
+              wordsContainer.append(this.oneWordShow(element, dataStat));
+            });
+          },
+        );
+      } else {
+        wordsContainer.innerHTML = 'Авторизирутесь, пожалуйста!';
+      }
+    }
     gamesButtonContainer.append(sprintButton);
     gamesButtonContainer.append(audionChallengeButton);
-
-    await GetData.getData(`words?group=${currentPart}&&page=${currentPage}`, (result) => {
-      result.forEach((element) => {
-        wordsContainer.append(this.oneWordShow(element));
-      });
-    });
     sectionWordElement.append(gamesButtonContainer);
     sectionWordElement.append(wordsContainer);
     return sectionWordElement;
   }
 
-  changeStatForWord(id:string, stat:string) {
-    // todo add.or delete word from hard.words
-    console.log(id);
-    console.log(stat);
+  changeStatForWord(
+    id:string,
+    stat:string,
+    oldStat:TUserWord,
+    wordActionsWrapper:HTMLElement,
+  ) {
+    const userWord:TUserWord = {
+      difficulty: 'normal',
+      optional: {
+        correctCount: 0,
+        isStudy: false,
+        totalCorrectCount: 0,
+        totalIncorrectCount: 1,
+      },
+    };
+    let method = 'POST';
+    if (oldStat !== undefined) {
+      method = 'PUT';
+      if (stat === 'hard' && oldStat.difficulty === 'hard') {
+        userWord.difficulty = 'hard';
+      }
+      if (stat === 'learned' && (!oldStat.optional || !oldStat.optional.isStudy)) {
+        userWord.optional.isStudy = true;
+      }
+    } else {
+      if (stat === 'hard') {
+        userWord.difficulty = 'hard';
+      }
+      if (stat === 'learned') {
+        userWord.optional.isStudy = true;
+      }
+    }
+    const user = this.store.getUser();
+    PostData.setUserWordsData(user.id, user.token, id, userWord, () => {
+      this.actionsButtonsSet(id, userWord, wordActionsWrapper);
+    }, method);
   }
 
-  oneWordShow(word: TWordSimple):HTMLElement {
+  oneWordShow(word: TWordSimple, dataStat:TStat):HTMLElement {
+    console.log(dataStat);
     const wordWrapper = document.createElement('div');
     wordWrapper.classList.add('textbook-one_word-element');
     const wordImage = document.createElement('div');
@@ -127,24 +193,44 @@ export default class Textbook extends MainPage {
     wordWrapper.append(wordInfoWrapper);
     if (this.store.getAuthorized()) {
       const wordActionsWrapper = document.createElement('div');
-      wordActionsWrapper.classList.add('actions-buttons');
-      const easyButton = document.createElement('div');
-      easyButton.classList.add('word_easy-word');
-      easyButton.textContent = 'Знаю!';
-      easyButton.addEventListener('click', () => {
-        this.changeStatForWord(word.id, 'easy');
-      });
-      const hardButton = document.createElement('div');
-      hardButton.classList.add('word_hard-word');
-      hardButton.textContent = 'Сложно!';
-      hardButton.addEventListener('click', () => {
-        this.changeStatForWord(word.id, 'hard');
-      });
-      wordActionsWrapper.append(easyButton);
-      wordActionsWrapper.append(hardButton);
+      const wordId = word.id;
+      const stat = dataStat[wordId];
+      console.log('----2---');
+      console.log(wordId);
+      console.log(dataStat);
+      console.log('----3---');
+      this.actionsButtonsSet(wordId, stat, wordActionsWrapper);
       wordWrapper.append(wordActionsWrapper);
     }
     return wordWrapper;
+  }
+
+  actionsButtonsSet(wordId:string, stat:TUserWord, wordActionsWrapper:HTMLElement) {
+    // eslint-disable-next-line no-param-reassign
+    wordActionsWrapper.innerHTML = '';
+    console.log(stat);
+    let classStat = 'normal';
+    if (stat && stat.difficulty) classStat = stat.difficulty;
+    if (stat && stat.optional && stat.optional.isStudy) classStat = 'learned';
+
+    wordActionsWrapper.classList.add('actions-buttons');
+    wordActionsWrapper.classList.add(`buttons__stat__${classStat}`);
+    const easyButton = document.createElement('div');
+    easyButton.classList.add('word_easy-word');
+    easyButton.classList.add(`word_easy-word__${classStat}`);
+    easyButton.textContent = !(classStat === 'learned') ? 'Знаю!' : 'Не знаю!';
+    easyButton.addEventListener('click', () => {
+      this.changeStatForWord(wordId, 'learned', stat, wordActionsWrapper);
+    });
+    const hardButton = document.createElement('div');
+    hardButton.classList.add('word_hard-word');
+    hardButton.classList.add(`word_hard-word__${classStat}`);
+    hardButton.textContent = (classStat !== 'hard') ? 'Сложно!' : 'Легко';
+    hardButton.addEventListener('click', () => {
+      this.changeStatForWord(wordId, 'hard', stat, wordActionsWrapper);
+    });
+    wordActionsWrapper.append(easyButton);
+    wordActionsWrapper.append(hardButton);
   }
 
   setPartsAndPages() {
@@ -188,25 +274,27 @@ export default class Textbook extends MainPage {
   drawPages(currentPart = 0, currentPage = 0):HTMLElement {
     const pageElement = document.createElement('section');
     pageElement.classList.add('pages-wrapper');
-    const pageBaseElement = document.createElement('ul');
-    pageBaseElement.classList.add('pages-container');
-    const pagesLink = this.dataForPagesRender(currentPage);
-    console.log(pagesLink);
-    pagesLink.forEach((element) => {
-      const thisPart = document.createElement('li');
-      thisPart.classList.add('textBook-page-link');
-      if (element[1] !== -1) {
-        const linkData = document.createElement('a');
-        linkData.classList.add('textBook_page_link');
-        linkData.setAttribute('href', `#Textbook_${currentPart}_${element[1]}`);
-        linkData.textContent = element[0].toString();
-        thisPart.append(linkData);
-      } else {
-        thisPart.textContent = element[0].toString();
-      }
-      pageBaseElement.append(thisPart);
-    });
-    pageElement.append(pageBaseElement);
+    if (currentPart < TEXTBOOK_PARTS) {
+      const pageBaseElement = document.createElement('ul');
+      pageBaseElement.classList.add('pages-container');
+      const pagesLink = this.dataForPagesRender(currentPage);
+      console.log(pagesLink);
+      pagesLink.forEach((element) => {
+        const thisPart = document.createElement('li');
+        thisPart.classList.add('textBook-page-link');
+        if (element[1] !== -1) {
+          const linkData = document.createElement('a');
+          linkData.classList.add('textBook_page_link');
+          linkData.setAttribute('href', `#Textbook_${currentPart}_${element[1]}`);
+          linkData.textContent = element[0].toString();
+          thisPart.append(linkData);
+        } else {
+          thisPart.textContent = element[0].toString();
+        }
+        pageBaseElement.append(thisPart);
+      });
+      pageElement.append(pageBaseElement);
+    }
     return pageElement;
   }
 

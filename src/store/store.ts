@@ -2,6 +2,7 @@ import {
   PagesCategory, TStoreBase, TPage, StoreCallbackFunction,
   TPageAndPart,
 } from '@common/baseTypes';
+/* import GetData from '@src/api/getData'; */
 
 export default class Store {
   private store:TStoreBase;
@@ -74,11 +75,21 @@ export default class Store {
   }
 
   async setWords(resolve = 'simple') {
-    if (this.store.uid !== '') {
-      this.store.words = {};
+    /*     if (this.store.uid !== '' && this.store.token) {
+      GetData.getUserWordsData(this.store.uid, this.store.token, (data) => {
+        data.forEach( userWord => {
+          if(userWord.wordId) {
+            if (!this.store.words) {
+            this.store.words = {};
+            }
+            this.store.words[userWord.wordId].difficulty = userWord.difficulty;
+
+          }
+        })
+      });
     } else {
       this.store.words = {};
-    }
+    } */
     if (resolve === 'authorize') {
       this.resolveWatchers('Authorize');
     }
