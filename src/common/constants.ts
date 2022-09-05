@@ -10,6 +10,7 @@ const CORRECT_COUNT_HARD = 5;
 const PAGE_IDS = {
   Textbook: 'Textbook',
   AudioChallenge: 'AudioChallenge',
+  SprintChallenge: 'SprintChallenge',
   Main: 'Main',
 };
 
