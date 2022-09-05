@@ -39,6 +39,7 @@ export default class Textbook extends MainPage {
     sectionWordElement.classList.add(`textbook-part_${currentPart}`);
     const wordsContainer = document.createElement('div');
     wordsContainer.classList.add('textbook-word-wrapper');
+    wordsContainer.classList.add(`textbook-word-wrapper_${currentPart}`);
     const gamesButtonContainer = document.createElement('div');
     gamesButtonContainer.classList.add('games-button-wrapper');
     const sprintButton = document.createElement('a');
