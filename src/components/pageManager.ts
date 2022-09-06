@@ -1,6 +1,6 @@
+import SprintChallenge from '@src/games/sprint';
 import Router from '../api/router';
 import AudioChallenge from '../games/audiochallenge/audiochallenge';
-import SprintChallenge from '@src/games/sprint';
 import Store from '../store/store';
 import MainPage from './mainPage';
 import Textbook from './textbook/textBook';
@@ -14,7 +14,8 @@ const PAGES_TYPES = {
   Statistics,
 };
 
-type TPageClass = { [key:string]: AudioChallenge | SprintChallenge | MainPage | Textbook | Statistics } | undefined;
+type TPageClass = {
+  [key:string]: AudioChallenge | SprintChallenge | MainPage | Textbook | Statistics } | undefined;
 
 export default class PageManager {
   store:Store;

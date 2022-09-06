@@ -135,7 +135,6 @@ export default class Textbook extends MainPage {
   }
 
   oneWordShow(word: TWordSimple, dataStat:TStat):HTMLElement {
-    console.log(dataStat);
     const wordWrapper = document.createElement('div');
     wordWrapper.classList.add('textbook-one_word-element');
     const wordImage = document.createElement('div');
@@ -195,12 +194,9 @@ export default class Textbook extends MainPage {
     wordWrapper.append(wordInfoWrapper);
     if (this.store.getAuthorized()) {
       const wordActionsWrapper = document.createElement('div');
-      const wordId = word.id;
+      // eslint-disable-next-line no-underscore-dangle
+      const wordId = word.id || word._id as string;
       const stat = dataStat[wordId];
-      console.log('----2---');
-      console.log(wordId);
-      console.log(dataStat);
-      console.log('----3---');
       this.actionsButtonsSet(wordId, stat, wordActionsWrapper);
       wordWrapper.append(wordActionsWrapper);
     }
@@ -210,14 +206,38 @@ export default class Textbook extends MainPage {
   actionsButtonsSet(wordId:string, stat:TUserWord, wordActionsWrapper:HTMLElement) {
     // eslint-disable-next-line no-param-reassign
     wordActionsWrapper.innerHTML = '';
-    console.log(stat);
     let classStat = 'normal';
     if (stat && stat.difficulty) classStat = stat.difficulty;
     if (stat && stat.optional && stat.optional.isStudy) classStat = 'learned';
 
+    if (stat && stat.optional) {
+      const statOpts = stat.optional;
+      const wordStat = document.createElement('div');
+      const allAnswers = statOpts.totalIncorrectCount + statOpts.totalCorrectCount;
+      if (!statOpts.isStudy && allAnswers > 0) {
+        wordStat.classList.add('one-word__wrong_and_correct');
+        for (let i = 0; i < statOpts.totalIncorrectCount; i += 1) {
+          const wordStatOneCell = document.createElement('div');
+          wordStatOneCell.classList.add('one-answer');
+          wordStatOneCell.classList.add('wrong-answer');
+          wordStat.append(wordStatOneCell);
+        }
+        for (let i = 0; i < statOpts.totalCorrectCount; i += 1) {
+          const wordStatOneCell = document.createElement('div');
+          wordStatOneCell.classList.add('one-answer');
+          wordStatOneCell.classList.add('correct-answer');
+          wordStat.append(wordStatOneCell);
+        }
+      } else if (statOpts.isStudy) {
+        wordStat.classList.add('one-word__studied');
+      }
+      wordActionsWrapper.append(wordStat);
+    }
+
     wordActionsWrapper.classList.add('actions-buttons');
     wordActionsWrapper.classList.add(`buttons__stat__${classStat}`);
     const easyButton = document.createElement('div');
+    easyButton.classList.add('word-button');
     easyButton.classList.add('word_easy-word');
     easyButton.classList.add(`word_easy-word__${classStat}`);
     easyButton.textContent = !(classStat === 'learned') ? 'Знаю!' : 'Не знаю!';
@@ -225,6 +245,7 @@ export default class Textbook extends MainPage {
       this.changeStatForWord(wordId, 'learned', stat, wordActionsWrapper);
     });
     const hardButton = document.createElement('div');
+    hardButton.classList.add('word-button');
     hardButton.classList.add('word_hard-word');
     hardButton.classList.add(`word_hard-word__${classStat}`);
     hardButton.textContent = (classStat !== 'hard') ? 'Сложно!' : 'Легко';
@@ -282,7 +303,6 @@ export default class Textbook extends MainPage {
       const pageBaseElement = document.createElement('ul');
       pageBaseElement.classList.add('pages-container');
       const pagesLink = this.dataForPagesRender(currentPage);
-      console.log(pagesLink);
       pagesLink.forEach((element) => {
         const thisPart = document.createElement('li');
         thisPart.classList.add('textBook-page-link');

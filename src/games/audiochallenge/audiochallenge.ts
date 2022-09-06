@@ -56,6 +56,7 @@ export default class AudioChallenge {
   }
 
   create():HTMLElement {
+    console.log('create');
     this.element.classList.add('audio-challenge');
     const gameWrapper = '<div class="games-wrapper"></div>';
     this.element.innerHTML = gameWrapper;
@@ -90,7 +91,7 @@ export default class AudioChallenge {
       const user = this.store.getUser();
       if (this.group === 6) {
         this.wordsArray = await getUserHardWords(user.id, user.token);
-      } else if (this.group && this.page) {
+      } else if (this.group !== undefined && this.page !== undefined) {
         this.wordsArray = await getUserWords(this.group, this.page, user.id, user.token);
       // console.log(this.wordsArray);
       }
