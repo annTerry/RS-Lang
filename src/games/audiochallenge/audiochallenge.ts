@@ -98,7 +98,13 @@ export default class AudioChallenge {
     } else if (this.group && this.group < 6) {
       this.wordsArray = await getWords(this.group, this.page);
     }
-    this.startGame();
+    if (this.wordsArray.length < 2) {
+      this.element.innerHTML = `
+      <p> Недостаточно данных для игры </p>
+      `;
+    } else {
+      this.startGame();
+    }
   }
 
   drawLayout(HTMLLayout: string, wrapperClass:string) {
