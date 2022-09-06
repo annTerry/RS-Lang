@@ -15,6 +15,7 @@ export default class Textbook extends MainPage {
 
   constructor(store:Store) {
     super(store, 'Textbook');
+    this.element.innerHTML = '';
     this.setPartsAndPages();
     this.store.addWatcher('currentPage', () => {
       this.redrawNavigation();

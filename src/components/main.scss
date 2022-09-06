@@ -1,0 +1,55 @@
+.about-section
+{
+  border: 10px solid #57A8C1;
+  border-radius: 10px;
+  padding: 10px;
+  width:90%;
+  margin:10px auto;
+}
+.users-section {
+  display: flex;
+  justify-content: space-evenly;
+  div.author {
+    width:30%;
+    border: 5px solid #57A8C1;
+    border-radius: 10px;
+    padding: 10px;
+  }
+}
+.link-header {
+  font-size: 1.4em;
+  text-align: center;
+  font-weight: bold;
+  text-decoration: none;
+  color:#225c9f;
+  background-image: url('../assets/images/github.svg');
+  padding-left: 30px;
+  background-size: 20px;
+  background-position: 0;
+  background-repeat: no-repeat;
+  &:hover {
+color: #57A8C1;
+}
+}
+.author-description
+{
+  margin-top: 10px;
+  min-height: 150px;
+  padding: 5px;
+  padding-left: 160px;
+  background-size: 120px;
+  background-position: 10px 10px;
+  background-repeat: no-repeat;
+  &.annTerry-img
+  {
+    background-image: url('../assets/images/annTerry.png');
+  }
+  &.AlexOlga-img
+  {
+    background-image: url('../assets/images/alexOlga.png');
+  }
+  &.juliv-img
+  {
+    background-image: url('../assets/images/juliv.jpeg');
+  }
+}

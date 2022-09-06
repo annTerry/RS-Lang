@@ -21,7 +21,7 @@ export default class Header {
         <div class="container header__in">
 
           <div class="logo">
-            <a href="/">${TITLE}</a>
+            <a href="/RS-Lang">${TITLE}</a>
           </div>
 
           <nav class="menu js-menu"></nav>
