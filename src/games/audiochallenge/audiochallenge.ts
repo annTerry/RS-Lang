@@ -56,7 +56,6 @@ export default class AudioChallenge {
   }
 
   create():HTMLElement {
-    console.log('create');
     this.element.classList.add('audio-challenge');
     const gameWrapper = '<div class="games-wrapper"></div>';
     this.element.innerHTML = gameWrapper;

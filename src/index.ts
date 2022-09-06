@@ -8,6 +8,8 @@ import Store from './store/store';
 import Router from './api/router';
 import PageManager from './components/pageManager';
 
+console.log('Пожалуйста, если возможно, подождите с проверкой до четверга');
+
 const mainStore = new Store();
 const mainRouter = new Router(mainStore);
 
