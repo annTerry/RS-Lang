@@ -34,6 +34,7 @@ async function getUserWord(userId: string, userToken: string, wordId:string) {
   const content = await response.json();
   return content[0].userWord;
 }
+
 async function updateUserWord(
   userId: string,
   userToken: string,
@@ -88,6 +89,21 @@ async function getUserWords(groupId: number, pageId: number, userId:string, user
   } while (wordsArray.length < 20 && page >= 0);
   return wordsArray;
 }
+
+async function getUserHardWords(userId: string, userToken: string) {
+  const filter = { $and: [{ 'userWord.difficulty': 'hard', 'userWord.optional.isStudy': false }] };
+  const res = await fetch(`${DATABASE_LINK}/users/${userId}/aggregatedWords?filter=${JSON.stringify(filter)}`, {
+    method: 'GET',
+    headers: {
+      Authorization: `Bearer ${userToken}`,
+      Accept: 'application/json',
+    },
+  });
+  const result = await res.json();
+  const wordsArray: Array<TWordSimple> = result[0].paginatedResults;
+  return wordsArray;
+}
+
 export {
-  getUserWord, createUserWord, updateUserWord, getUserWords, getWords,
+  getUserWord, createUserWord, updateUserWord, getUserWords, getWords, getUserHardWords,
 };

@@ -58,22 +58,12 @@ type TStoreBase = {
   username?: string,
   token?: string,
   currentPage: TPage,
-  words?: TWordObject,
+  words?: { [id:string]: TUserWord },
   textBook?: TPageAndPart,
 };
 
-type GetWordsFunction = (data:Array<TWordSimple>) => void;
-type PostUserFunction = (data:TUser) => boolean;
-type StoreCallbackFunction = ()=>void;
-
-type TErrorMessage = {
-  path?: string,
-  message?: string,
-};
-
-type TAlertType = 'success' | 'warning' | 'danger';
-
 type TUserWord = {
+  wordId?:string,
   difficulty: string
   optional: {
     isStudy: boolean,
@@ -82,6 +72,19 @@ type TUserWord = {
     totalCorrectCount: number;
   },
 };
+
+type GetWordsFunction = (data:Array<TWordSimple>) => void;
+type PostUserFunction = (data:TUser) => boolean;
+type StoreCallbackFunction = ()=>void;
+type GetUserWordsFunction = (data:Array<TUserWord>) => void;
+
+type TErrorMessage = {
+  path?: string,
+  message?: string,
+};
+type TStat = { [id:string]: TUserWord };
+type TAlertType = 'success' | 'warning' | 'danger';
+
 type TUserStatistic = {
   learnedWords: number,
   optional: {
@@ -94,10 +97,11 @@ type TUserStatistic = {
     }
   }
 };
-
+type GetWordsStatFunction = (data:Array<TUserWord>) => void;
 export {
   TWordSimple, TUser, GetWordsFunction, PostUserFunction,
   TStoreBase, TPage, PagesCategory, TWordStat, TWordObject,
-  TAlertType, TErrorMessage,
+  TAlertType, TErrorMessage, GetWordsStatFunction,
   StoreCallbackFunction, TPageAndPart, TUserWord, TUserStatistic,
+  GetUserWordsFunction, TStat,
 };

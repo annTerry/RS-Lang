@@ -2,6 +2,7 @@ import {
   PagesCategory, TStoreBase, TPage, StoreCallbackFunction,
   TPageAndPart,
 } from '@common/baseTypes';
+/* import GetData from '@src/api/getData'; */
 
 export default class Store {
   private store:TStoreBase;
@@ -73,6 +74,27 @@ export default class Store {
     return !!this.store.uid;
   }
 
+  async setWords(resolve = 'simple') {
+    /*     if (this.store.uid !== '' && this.store.token) {
+      GetData.getUserWordsData(this.store.uid, this.store.token, (data) => {
+        data.forEach( userWord => {
+          if(userWord.wordId) {
+            if (!this.store.words) {
+            this.store.words = {};
+            }
+            this.store.words[userWord.wordId].difficulty = userWord.difficulty;
+
+          }
+        })
+      });
+    } else {
+      this.store.words = {};
+    } */
+    if (resolve === 'authorize') {
+      this.resolveWatchers('Authorize');
+    }
+  }
+
   setAuthorized(uid: string, username: string, token?: string) {
     try {
       if (typeof token !== 'string' || !token || !uid) {
@@ -90,10 +112,10 @@ export default class Store {
         this.setItem('username', username);
         this.setItem('token', token);
       }
+      this.setWords('authorize');
     } catch (e) {
       console.error('Wrong Authorization params');
     }
-    this.resolveWatchers('Authorize');
   }
 
   setCurrentTextBook(part = 0, number = 0) {
