@@ -62,20 +62,28 @@ export default class AudioChallenge {
     // скрываем footer
     const footer = <HTMLElement> document.getElementsByClassName('footer')[0];
     if (footer) footer.classList.add('conceal');
+<<<<<<< HEAD
 
     this.group = this.store.getCurrentPartNumber();
     this.page = this.store.getCurrentPageNumber();
 
+=======
+    const { hash } = document.location;
+>>>>>>> dev
     // если пришли с главной страницы
-    if (this.group === undefined
+    /* if (this.group === undefined
       || (this.group < 6 && this.page === undefined)
-      || (this.group === 6 && !this.store.getAuthorized())) {
+      || (this.group === 6 && !this.store.getAuthorized())) { */
+    if (hash === '#AudioChallenge') {
       this.drawLayout(StartPopUpLayout, 'games-wrapper');
       const btnLevels = <HTMLElement> this.element.getElementsByClassName('buttons-levels-wrapper')[0];
       btnLevels.addEventListener('click', (e: Event) => { this.handleLevelBtn(e); });
       // выбор уровня с клавиатуры
       document.onkeydown = (e) => { this.handleLevelKeyboard(e); };
     } else {
+      const arrHash = hash.split('_');
+      this.group = Number(arrHash[1]);
+      this.page = Number(arrHash[2]);
       this.startGameInTextBook();
     }
 

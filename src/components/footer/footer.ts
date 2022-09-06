@@ -30,7 +30,7 @@ export default class Footer {
           </div>
           <div class="footer__rs-school">
             <a href="https://rs.school/js/" target="_blank">
-              <img src="${rsSchoolImg}" alt="RS School JS" class="footer__rs-school__img">
+            <img src="${rsSchoolImg}" alt="RS School JS" class="footer__rs-school__img">
             </a>
           </div>
         </div>
