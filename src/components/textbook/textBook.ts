@@ -194,7 +194,8 @@ export default class Textbook extends MainPage {
     wordWrapper.append(wordInfoWrapper);
     if (this.store.getAuthorized()) {
       const wordActionsWrapper = document.createElement('div');
-      const wordId = word.id;
+      // eslint-disable-next-line no-underscore-dangle
+      const wordId = word.id || word._id as string;
       const stat = dataStat[wordId];
       this.actionsButtonsSet(wordId, stat, wordActionsWrapper);
       wordWrapper.append(wordActionsWrapper);
@@ -225,6 +226,7 @@ export default class Textbook extends MainPage {
           const wordStatOneCell = document.createElement('div');
           wordStatOneCell.classList.add('one-answer');
           wordStatOneCell.classList.add('correct-answer');
+          wordStat.append(wordStatOneCell);
         }
       } else if (statOpts.isStudy) {
         wordStat.classList.add('one-word__studied');
