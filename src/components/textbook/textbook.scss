@@ -288,7 +288,7 @@ $color_part7: #3d0e7a;
   align-self: stretch;
   justify-content: center;
   text-align: center;
-  div {
+  .word-button {
     height: 40px;
     width: 200px;
     margin: 10px;
@@ -327,4 +327,32 @@ color:white;
       background-color: #040658; 
     }
   }
+}
+
+.one-word__wrong_and_correct
+{
+  display: flex;
+  align-self: end;
+  margin: 5px;
+  .one-answer {
+    width:10px;
+    height:10px;
+    border:1px solid #ccc;
+  }
+  .wrong-answer {
+    background-color: red;
+  }
+  .wrong-answer {
+    background-color: green;
+  }
+}
+.one-word__studied
+{
+  width:30px;
+  height:30px;
+  background-size: 28px;
+  background-position: 1px;
+  background-repeat: no-repeat;
+  background-image: url('../../assets/svg/ok.svg'); 
+  align-self: end;
 }

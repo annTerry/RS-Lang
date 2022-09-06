@@ -65,7 +65,7 @@ export default class AudioChallenge {
 
     this.group = this.store.getCurrentPartNumber();
     this.page = this.store.getCurrentPageNumber();
-    console.log(this.group, this.page);
+
     // если пришли с главной страницы
     if (this.group === undefined
       || (this.group < 6 && this.page === undefined)
