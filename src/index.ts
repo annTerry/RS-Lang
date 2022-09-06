@@ -11,11 +11,6 @@ import PageManager from './components/pageManager';
 const mainStore = new Store();
 const mainRouter = new Router(mainStore);
 
-console.log('По возможности, отложите, пожалуйста, проверку на четверг');
-
-/* mainStore.setCurrentPage('AudioChallenge');
-console.log(mainStore.getCurrentPageName());
- */
 (() => new Header(mainStore, mainRouter))();
 (() => new Auth(mainStore))();
 (() => new PageManager(mainStore, mainRouter))();
