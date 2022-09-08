@@ -26,9 +26,7 @@ export default class GetData {
         Accept: 'application/json',
       },
     }).then((response) => response.json()).then((resData:JSON) => {
-      console.log(resData);
       const data = JSON.parse(JSON.stringify(resData));
-      console.log(data);
       const returnData: Array<TWordSimple> = data[0].paginatedResults;
       fn(returnData);
     }).catch((err) => {
