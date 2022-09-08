@@ -1,44 +1,33 @@
-import './styles.scss';
+import './style.scss';
 import Store from '@src/store/store';
 import {
-  LIVES_GAME, CORRECT_COUNT, CORRECT_COUNT_HARD,
+  CORRECT_COUNT, CORRECT_COUNT_HARD, SPRINT_DURATION, TEXTBOOK_PARTS
 } from '@common/constants';
 import { TWordSimple, TUserWord } from '@common/baseTypes';
 import {
   getUserWord, createUserWord, updateUserWord, getUserWords, getWords,
 } from '@src/api/userWords';
-import { updateUserStatistic, getUserStatistic } from '@src/api/userStatistic';
-import isDataToday from '@src/helpers';
-import AudioChallengeResults from '../audiochallenge/results';
-import Question from '../audiochallenge/question';
+// import { updateUserStatistic, getUserStatistic } from '@src/api/userStatistic';
+// import isDataToday from '@src/helpers';
+import SprintChallengeResults from './results';
+import Question from './question';
 import { StartPopUpLayout, gameLayout, questionLayout } from './html';
 
 export default class SprintChallenge {
   group: number | undefined;
-
   element = document.createElement('section');
-
   page: number | undefined;
-
   wordsArray: TWordSimple[];
-
   questionNum: number;
-
   correctAnswers: TWordSimple[];
-
   wrongAnswers: TWordSimple[];
-
-  livesInGame: number;
-
   seriesNow: number;
-
   seriesResult: number;
-
   store: Store;
-
   newWords: number;
-
   learnedWords: number;
+  timer: number | undefined;
+  remainSeconds: number;
 
   constructor(store: Store) {
     this.store = store;
@@ -48,31 +37,35 @@ export default class SprintChallenge {
     this.wordsArray = [];
     this.correctAnswers = [];
     this.wrongAnswers = [];
-    this.livesInGame = LIVES_GAME;
     this.seriesNow = 0;
     this.seriesResult = 0;
     this.newWords = 0;
     this.learnedWords = 0;
+    this.remainSeconds = SPRINT_DURATION;
   }
 
-  create():HTMLElement {
-    this.element.classList.add('audio-challenge');
+  create(): HTMLElement {
+    this.element.classList.add('audio-challenge', 'container');
     this.element.innerHTML = '<div class="games-wrapper"></div>';
     // скрываем footer
     const footer = <HTMLElement> document.getElementsByClassName('footer')[0];
-    if (footer) footer.classList.add('conceal');
+    if (footer) footer.classList.add('hide');
 
     this.group = this.store.getCurrentPartNumber();
     this.page = this.store.getCurrentPageNumber();
-    console.log(this.group, this.page);
+
     // если пришли с главной страницы
     if (this.group === undefined
       || this.page === undefined) {
       this.drawLayout(StartPopUpLayout, 'games-wrapper');
       const btnLevels = <HTMLElement> this.element.getElementsByClassName('buttons-levels-wrapper')[0];
-      btnLevels.addEventListener('click', (e: Event) => { this.handleLevelBtn(e); });
+      btnLevels.addEventListener('click', e => {
+        this.handleLevelBtn(e);
+      });
       // выбор уровня с клавиатуры
-      document.onkeydown = (e) => { this.handleLevelKeyboard(e); };
+      document.onkeydown = (e) => {
+        this.handleLevelKeyboard(e);
+      };
     } else {
       this.startGameInTextBook();
     }
@@ -87,9 +80,10 @@ export default class SprintChallenge {
       const user = this.store.getUser();
       if (this.group && this.page) {
         this.wordsArray = await getUserWords(this.group, this.page, user.id, user.token);
-      // console.log(this.wordsArray);
       }
-    } else if (this.group) this.wordsArray = await getWords(this.group, this.page);
+    } else if (this.group) {
+      this.wordsArray = await getWords(this.group, this.page);
+    }
 
     this.startGame();
   }
@@ -99,121 +93,129 @@ export default class SprintChallenge {
     wrapper.innerHTML = HTMLLayout;
   }
 
+  // Выбор уровня при клике мышкой на кнопку
   async handleLevelBtn(e: Event) {
-    const elm = <HTMLElement>e.target;
-    const arrayId = ['bt_false', 'bt_true'];
-    this.group = arrayId.indexOf(elm.id);
-    if (this.group !== -1) {
+    e.preventDefault();
+    const el = e.target as HTMLElement;
+    const level = Number(el.dataset.id);
+    this.selectLevel(level);
+  }
+
+  // Выбор уровня при нажатии на клавишу 1-6
+  async handleLevelKeyboard(e: KeyboardEvent) {
+    const level = Number(e.key);
+    if (!isNaN(level) && level > 0 && level <= TEXTBOOK_PARTS) {
+      e.preventDefault();
+      this.selectLevel(level);
+    }
+  }
+
+  // Установка уровня игры (1-6)
+  async selectLevel(level: number) {
+    if (level > 0 && level <= TEXTBOOK_PARTS) {
+      this.group = level - 1;
       this.drawLayout(gameLayout, 'games-wrapper');
       this.drawLayout(questionLayout, 'game-question');
       this.wordsArray = await getWords(this.group, this.page);
       this.startGame();
+    } else {
+      this.group = -1;
     }
   }
 
   async startGame() {
-    // const wordsArray = await getWords(this.group, this.page);
     const word = this.wordsArray[this.questionNum];
-    const randomAnswers = this.getRandomAnswers(this.wordsArray, word.wordTranslate);
-    const question = new Question(word, randomAnswers);
+    if (this.timer === undefined) {
+      this.setTimer();
+    }
+    if (word === undefined) return;
+    const randomAnswers = this.getRandomAnswers(this.wordsArray);
+    const question = new Question(randomAnswers);
     question.render();
-    // кнопка пропустить
-    const skipBtn = <HTMLElement> document.getElementById('skip');
-    skipBtn.addEventListener('click', () => { question.showAnswers(); });
-    // кнопка далее
-    const nextBtn = <HTMLElement> document.getElementById('next');
-    nextBtn.addEventListener('click', async () => { await this.handleNextBtn(question); });
-    // клавиатура
-    document.onkeydown = async (e) => { await this.handleKeyboard(e, question); };
+    // Проверяем ответ (кнопки)
+    const btnAnswersContainer = <HTMLElement>document.querySelector('.btn-answer-wrapper');
+    btnAnswersContainer.addEventListener('click', e => {
+      this.handleAnswersBtn(e, question);
+    });
+    // Проверяем ответ (клавиши-стрелки)
+    document.onkeydown = async (e) => {
+      await this.handleKeyboard(e, question);
+    };
   }
 
-  getRandomAnswers(wordsArray:Array<TWordSimple>, word:string):Array<string> {
-    const randomAnswers: Set<string> = new Set();
+  async finishGame() {
+    const result = new SprintChallengeResults(
+      this.correctAnswers,
+      this.wrongAnswers,
+      this.seriesResult,
+    );
+    if (this.store.getAuthorized()) {
+      //await this.setStatisticGame();
+    }
+    result.start();
+  }
+
+  getRandomAnswers(wordsArray: Array<TWordSimple>): Array<TWordSimple> {
+    const randomAnswers: Set<TWordSimple> = new Set();
     do {
       const newIndex = Math.floor(Math.random() * wordsArray.length);
-      const answer = wordsArray[newIndex].wordTranslate;
-      if (answer !== word) randomAnswers.add(wordsArray[newIndex].wordTranslate);
-    } while (randomAnswers.size !== 4);
+      randomAnswers.add(wordsArray[newIndex]);
+    } while (randomAnswers.size !== 2);
     return Array.from(randomAnswers);
   }
 
   async handleNextBtn(question: Question) {
+    const div = document.querySelector('.game-question') as HTMLElement;
     if (question.isCorrect) {
-      this.correctAnswers.push(question.word);
+      div.classList.add('game-question_true');
+      this.correctAnswers.push(question.words[0]);
       this.seriesNow += 1;
       if (this.store.getAuthorized()) {
-        await this.updateCorrectUserWord(question.word);
+        await this.updateCorrectUserWord(question.words[0]);
       }
     } else {
+      div.classList.add('game-question_false');
       if (this.store.getAuthorized()) {
-        await this.updateIncorrectUserWord(question.word);
+        await this.updateIncorrectUserWord(question.words[0]);
       }
-      this.wrongAnswers.push(question.word);
-      this.livesInGame -= 1;
+      this.wrongAnswers.push(question.words[0]);
       this.getSeriesResult();
-      this.drawLives();
     }
 
-    if ((this.livesInGame > 0) && (this.questionNum < this.wordsArray.length - 1)) {
+    setTimeout(() => {
+      div.classList.remove('game-question_true', 'game-question_false');
+    }, 500);
+
+    if ((this.remainSeconds > 0) && (this.questionNum < this.wordsArray.length - 1)) {
       this.questionNum += 1;
       this.drawLayout(questionLayout, 'game-question');
       this.startGame();
     } else {
-      // game over
-      const result = new AudioChallengeResults(
-        this.correctAnswers,
-        this.wrongAnswers,
-        this.seriesResult,
-      );
-      if (this.store.getAuthorized()) {
-        await this.setStatisticGame();
-      }
-      result.start();
+      this.finishGame();
     }
   }
 
   getSeriesResult() {
-    if (this.seriesNow > this.seriesResult) this.seriesResult = this.seriesNow;
+    if (this.seriesNow > this.seriesResult) {
+      this.seriesResult = this.seriesNow;
+    }
     this.seriesNow = 0;
   }
 
-  drawLives() {
-    const livesArray = this.element.querySelectorAll('.live-item');
-    const liveItem = <HTMLElement>livesArray[LIVES_GAME - this.livesInGame - 1];
-    liveItem.classList.add('live-item_over');
-  }
-
-  async handleKeyboard(e:KeyboardEvent, question: Question) {
-    if (e.key === ' ') {
+  async handleKeyboard(e: KeyboardEvent, question: Question) {
+    const code = e.code;
+    if (code === 'ArrowLeft' || code === 'ArrowRight') {
       e.preventDefault();
-      question.play();
-    }
-    const answerNumber = Number(e.key);
-    if (answerNumber > 0 && answerNumber < 6) {
-      e.preventDefault();
-      question.showAnswers();
-      question.checkAnswer(`answer${e.key}`);
-    }
-    const nextBtns = <HTMLElement> document.querySelector('#next');
-    if (nextBtns.classList.contains('conceal')) {
-      if (e.key === 'Enter') {
-        e.preventDefault();
-        question.showAnswers();
-      }
-    } else if (e.key === 'ArrowRight') {
-      e.preventDefault();
+      const isTrue = code === 'ArrowRight';
+      question.checkAnswer(isTrue);
       await this.handleNextBtn(question);
     }
   }
 
-  async handleLevelKeyboard(e: KeyboardEvent) {
-    const group = Number(e.key) - 1;
-    if (group >= 0 && group < 6) {
-      this.drawLayout(gameLayout, 'games-wrapper');
-      this.drawLayout(questionLayout, 'game-question');
-      this.wordsArray = await getWords(group, this.page);
-      this.startGame();
-    }
+  async handleAnswersBtn(e: Event, question: Question) {
+    const answer = Boolean((<HTMLElement>e.target).dataset.answer);
+    question.checkAnswer(answer);
+    await this.handleNextBtn(question);
   }
 
   async updateCorrectUserWord(word: TWordSimple) {
@@ -237,18 +239,20 @@ export default class SprintChallenge {
       if (wordId) createUserWord(user.id, user.token, wordId, userWordData);
     } else {
       // обновить слово
-      wordData.optional.correctCount += 1;
-      wordData.optional.totalCorrectCount += 1;
+      wordData.optional.correctCount++;
+      wordData.optional.totalCorrectCount++;
       if (wordData.difficulty === 'normal' && wordData.optional.correctCount >= CORRECT_COUNT) {
         wordData.optional.isStudy = true;
-        this.learnedWords += 1;
+        this.learnedWords++;
       }
       if (wordData.difficulty === 'hard' && wordData.optional.correctCount >= CORRECT_COUNT_HARD) {
         wordData.optional.isStudy = true;
         wordData.difficulty = 'normal';
-        this.learnedWords += 1;
+        this.learnedWords++;
       }
-      if (wordId) updateUserWord(user.id, user.token, wordId, wordData);
+      if (wordId) {
+        updateUserWord(user.id, user.token, wordId, wordData);
+      }
     }
   }
 
@@ -283,17 +287,17 @@ export default class SprintChallenge {
     }
   }
 
-  async setStatisticGame() {
+  /*async setStatisticGame() {
     const statistic = await getUserStatistic(
       this.store.getUser().id,
-      this.store.getUser().token,
+      this.store.getUser().token
     );
     if ((!statistic) || (!isDataToday(statistic.optional.date))) {
       const statisticObj = {
         learnedWords: 0,
         optional: {
           date: new Date().toLocaleDateString(),
-          audioChallenge: {
+          sprintChallenge: {
             correctAnswers: this.correctAnswers.length,
             wrongAnswers: this.wrongAnswers.length,
             series: this.seriesResult,
@@ -304,22 +308,38 @@ export default class SprintChallenge {
       await updateUserStatistic(
         this.store.getUser().id,
         this.store.getUser().token,
-        statisticObj,
+        statisticObj
       );
     } else {
       const { id, ...statisticObj } = statistic;
       statisticObj.learnedWords += this.learnedWords;
-      statisticObj.optional.audioChallenge.correctAnswers += this.correctAnswers.length;
-      statisticObj.optional.audioChallenge.wrongAnswers += this.wrongAnswers.length;
-      statisticObj.optional.audioChallenge.series = (
-        this.seriesResult > statisticObj.optional.audioChallenge.series
-      ) ? this.seriesResult : statisticObj.optional.audioChallenge.series;
-      statisticObj.optional.audioChallenge.newWords += this.newWords;
+      statisticObj.optional.sprintChallenge.correctAnswers += this.correctAnswers.length;
+      statisticObj.optional.sprintChallenge.wrongAnswers += this.wrongAnswers.length;
+      statisticObj.optional.sprintChallenge.series = (
+        this.seriesResult > statisticObj.optional.sprintChallenge.series
+      ) ? this.seriesResult : statisticObj.optional.sprintChallenge.series;
+      statisticObj.optional.sprintChallenge.newWords += this.newWords;
       await updateUserStatistic(
         this.store.getUser().id,
         this.store.getUser().token,
-        statisticObj,
+        statisticObj
       );
     }
+  }*/
+
+  setTimer() {
+    this.remainSeconds = SPRINT_DURATION;
+    const timer = <HTMLElement> document.querySelector('.game-timer');
+    this.timer = window.setInterval(() => {
+      timer.innerHTML = String(--this.remainSeconds);
+      if (this.remainSeconds < 10) {
+        timer.classList.add('game-timer_alert');
+      }
+      if (this.remainSeconds <= 0) {
+        window.clearInterval(this.timer);
+        this.finishGame();
+      }
+    }, 1000);
   }
-}
+
+};
