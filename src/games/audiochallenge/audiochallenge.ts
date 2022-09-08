@@ -56,7 +56,17 @@ export default class AudioChallenge {
   }
 
   create():HTMLElement {
-    console.log('create');
+    this.group = 0;
+    this.page = 0;
+    this.questionNum = 0;
+    this.wordsArray = [];
+    this.correctAnswers = [];
+    this.wrongAnswers = [];
+    this.livesInGame = LIVES_GAME;
+    this.seriesNow = 0;
+    this.seriesResult = 0;
+    this.newWords = 0;
+    this.learnedWords = 0;
     this.element.classList.add('audio-challenge');
     const gameWrapper = '<div class="games-wrapper"></div>';
     this.element.innerHTML = gameWrapper;
@@ -64,6 +74,7 @@ export default class AudioChallenge {
     const footer = <HTMLElement> document.getElementsByClassName('footer')[0];
     if (footer) footer.classList.add('conceal');
     const { hash } = document.location;
+    // console.log(hash);
     // если пришли с главной страницы
     /* if (this.group === undefined
       || (this.group < 6 && this.page === undefined)

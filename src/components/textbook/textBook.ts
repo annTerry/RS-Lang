@@ -27,9 +27,12 @@ export default class Textbook extends MainPage {
 
   redrawNavigation() {
     if (this.store.getCurrentPageName() === 'Textbook') {
-      if (this.parts !== undefined) this.element.removeChild(this.parts);
-      if (this.pages !== undefined) this.element.removeChild(this.pages);
-      if (this.wordsSection !== undefined) this.element.removeChild(this.wordsSection);
+      if (this.parts !== undefined
+        && this.element.contains(this.parts)) this.element.removeChild(this.parts);
+      if (this.pages !== undefined
+        && this.element.contains(this.pages)) this.element.removeChild(this.pages);
+      if (this.wordsSection !== undefined
+        && this.element.contains(this.wordsSection)) this.element.removeChild(this.wordsSection);
       this.setPartsAndPages();
     }
   }
@@ -81,7 +84,7 @@ export default class Textbook extends MainPage {
           user.token,
           (result) => {
             result.forEach((element) => {
-              wordsContainer.append(this.oneWordShow(element, dataStat));
+              wordsContainer.append(this.oneWordShow(element, dataStat, true));
             });
           },
         );
@@ -101,6 +104,7 @@ export default class Textbook extends MainPage {
     stat:string,
     oldStat:TUserWord,
     wordActionsWrapper:HTMLElement,
+    hardPage = false,
   ) {
     const userWord:TUserWord = {
       difficulty: 'normal',
@@ -108,7 +112,7 @@ export default class Textbook extends MainPage {
         correctCount: 0,
         isStudy: false,
         totalCorrectCount: 0,
-        totalIncorrectCount: 1,
+        totalIncorrectCount: 0,
       },
     };
     let method = 'POST';
@@ -130,11 +134,17 @@ export default class Textbook extends MainPage {
     }
     const user = this.store.getUser();
     PostData.setUserWordsData(user.id, user.token, id, userWord, () => {
-      this.actionsButtonsSet(id, userWord, wordActionsWrapper);
+      if (!hardPage) {
+        this.actionsButtonsSet(id, userWord, wordActionsWrapper);
+      } else {
+        const wordInPage = wordActionsWrapper.parentNode as HTMLElement;
+        const allWordsWrapper = wordInPage.parentNode as HTMLElement;
+        allWordsWrapper.removeChild(wordInPage);
+      }
     }, method);
   }
 
-  oneWordShow(word: TWordSimple, dataStat:TStat):HTMLElement {
+  oneWordShow(word: TWordSimple, dataStat:TStat, hardPage = false):HTMLElement {
     const wordWrapper = document.createElement('div');
     wordWrapper.classList.add('textbook-one_word-element');
     const wordImage = document.createElement('div');
@@ -197,13 +207,18 @@ export default class Textbook extends MainPage {
       // eslint-disable-next-line no-underscore-dangle
       const wordId = word.id || word._id as string;
       const stat = dataStat[wordId];
-      this.actionsButtonsSet(wordId, stat, wordActionsWrapper);
+      this.actionsButtonsSet(wordId, stat, wordActionsWrapper, hardPage);
       wordWrapper.append(wordActionsWrapper);
     }
     return wordWrapper;
   }
 
-  actionsButtonsSet(wordId:string, stat:TUserWord, wordActionsWrapper:HTMLElement) {
+  actionsButtonsSet(
+    wordId:string,
+    stat:TUserWord,
+    wordActionsWrapper:HTMLElement,
+    hardPage = false,
+  ) {
     // eslint-disable-next-line no-param-reassign
     wordActionsWrapper.innerHTML = '';
     let classStat = 'normal';
@@ -242,18 +257,20 @@ export default class Textbook extends MainPage {
     easyButton.classList.add(`word_easy-word__${classStat}`);
     easyButton.textContent = !(classStat === 'learned') ? 'Знаю!' : 'Не знаю!';
     easyButton.addEventListener('click', () => {
-      this.changeStatForWord(wordId, 'learned', stat, wordActionsWrapper);
-    });
-    const hardButton = document.createElement('div');
-    hardButton.classList.add('word-button');
-    hardButton.classList.add('word_hard-word');
-    hardButton.classList.add(`word_hard-word__${classStat}`);
-    hardButton.textContent = (classStat !== 'hard') ? 'Сложно!' : 'Легко';
-    hardButton.addEventListener('click', () => {
-      this.changeStatForWord(wordId, 'hard', stat, wordActionsWrapper);
+      this.changeStatForWord(wordId, 'learned', stat, wordActionsWrapper, hardPage);
     });
     wordActionsWrapper.append(easyButton);
-    wordActionsWrapper.append(hardButton);
+    if (!hardPage) {
+      const hardButton = document.createElement('div');
+      hardButton.classList.add('word-button');
+      hardButton.classList.add('word_hard-word');
+      hardButton.classList.add(`word_hard-word__${classStat}`);
+      hardButton.textContent = (classStat !== 'hard') ? 'Сложно!' : 'Легко';
+      hardButton.addEventListener('click', () => {
+        this.changeStatForWord(wordId, 'hard', stat, wordActionsWrapper);
+      });
+      wordActionsWrapper.append(hardButton);
+    }
   }
 
   setPartsAndPages() {
