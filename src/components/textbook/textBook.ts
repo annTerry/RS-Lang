@@ -46,7 +46,7 @@ export default class Textbook extends MainPage {
     const sprintButton = document.createElement('a');
     sprintButton.classList.add('one-game-button');
     sprintButton.textContent = 'Спринт';
-    sprintButton.href = `#Sprint_${currentPart}_${currentPage}`;
+    sprintButton.href = `#SprintChallenge_${currentPart}_${currentPage}`;
     const audionChallengeButton = document.createElement('a');
     audionChallengeButton.classList.add('one-game-button');
     audionChallengeButton.textContent = 'Аудиочелендж';

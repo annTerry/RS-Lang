@@ -5,7 +5,7 @@ import {
 } from '@common/constants';
 import { TWordSimple, TUserWord } from '@common/baseTypes';
 import {
-  getUserWord, createUserWord, updateUserWord, getUserWords, getWords,
+  getUserWord, createUserWord, updateUserWord, getUserWords, getWords, getUserHardWords,
 } from '@src/api/userWords';
 // import { updateUserStatistic, getUserStatistic } from '@src/api/userStatistic';
 // import isDataToday from '@src/helpers';
@@ -45,7 +45,8 @@ export default class SprintChallenge {
   }
 
   create(): HTMLElement {
-    this.element.classList.add('audio-challenge', 'container');
+    const { hash } = document.location;
+    this.element.classList.add('sprint-challenge', 'container');
     this.element.innerHTML = '<div class="games-wrapper"></div>';
     // скрываем footer
     const footer = <HTMLElement> document.getElementsByClassName('footer')[0];
@@ -54,9 +55,7 @@ export default class SprintChallenge {
     this.group = this.store.getCurrentPartNumber();
     this.page = this.store.getCurrentPageNumber();
 
-    // если пришли с главной страницы
-    if (this.group === undefined
-      || this.page === undefined) {
+    if (hash === '#SprintChallenge') {
       this.drawLayout(StartPopUpLayout, 'games-wrapper');
       const btnLevels = <HTMLElement> this.element.getElementsByClassName('buttons-levels-wrapper')[0];
       btnLevels.addEventListener('click', e => {
@@ -67,6 +66,9 @@ export default class SprintChallenge {
         this.handleLevelKeyboard(e);
       };
     } else {
+      const arrHash = hash.split('_');
+      this.group = Number(arrHash[1]);
+      this.page = Number(arrHash[2]);
       this.startGameInTextBook();
     }
 
@@ -78,14 +80,21 @@ export default class SprintChallenge {
     this.drawLayout(questionLayout, 'game-question');
     if (this.store.getAuthorized()) {
       const user = this.store.getUser();
-      if (this.group && this.page) {
+      if (this.group === 6) {
+        this.wordsArray = await getUserHardWords(user.id, user.token);
+      } else if (this.group !== undefined && this.page !== undefined) {
         this.wordsArray = await getUserWords(this.group, this.page, user.id, user.token);
       }
-    } else if (this.group) {
+    } else if (this.group && this.group < 6) {
       this.wordsArray = await getWords(this.group, this.page);
     }
-
-    this.startGame();
+    if (this.wordsArray.length < 2) {
+      this.element.innerHTML = `
+      <p> Недостаточно данных для игры </p>
+      `;
+    } else {
+      this.startGame();
+    }
   }
 
   drawLayout(HTMLLayout: string, wrapperClass:string) {
