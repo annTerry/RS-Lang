@@ -124,12 +124,12 @@ export default class SprintChallenge {
   }
 
   async startGame() {
-    const word = this.wordsArray[this.questionNum];
+    const firstIdx = this.questionNum;
     if (this.timer === undefined) {
       this.setTimer();
     }
-    if (word === undefined) return;
-    const randomAnswers = this.getRandomAnswers(this.wordsArray);
+    if (firstIdx >= this.wordsArray.length) return;
+    const randomAnswers = this.get2Words(this.wordsArray, firstIdx);
     const question = new Question(randomAnswers);
     question.render();
     // Проверяем ответ (кнопки)
@@ -155,11 +155,14 @@ export default class SprintChallenge {
     result.start();
   }
 
-  getRandomAnswers(wordsArray: Array<TWordSimple>): Array<TWordSimple> {
+  get2Words(wordsArray: Array<TWordSimple>, firstIdx: number): Array<TWordSimple> {
     const randomAnswers: Set<TWordSimple> = new Set();
+    randomAnswers.add(wordsArray[firstIdx]);
     do {
-      const newIndex = Math.floor(Math.random() * wordsArray.length);
-      randomAnswers.add(wordsArray[newIndex]);
+      const idx = Math.floor(Math.random() * wordsArray.length);
+      if (idx !== firstIdx) {
+        randomAnswers.add(wordsArray[idx]);
+      }
     } while (randomAnswers.size !== 2);
     return Array.from(randomAnswers);
   }
